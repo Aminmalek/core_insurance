@@ -61,7 +61,8 @@ class LoginView(APIView):
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key})
         else:
-            return Response({'error': 'user is not auhtenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+            content = {'error': 'user is not auhtenticated'}
+            return Response(content, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class LogoutView(APIView):
@@ -103,8 +104,8 @@ class GetUserView(APIView):
                      "token_is_valid": token_is_valid})
             else:
                 content = {"error": "user does not exist "}
-                return Response(content,status=status.HTTP_401_UNAUTHORIZED)
+                return Response(content, status=status.HTTP_401_UNAUTHORIZED)
 
         except Token.DoesNotExist:
             content = {"error": "there is not any Token in data base"}
-            return Response(content,status=status.HTTP_404_NOT_FOUND)
+            return Response(content, status=status.HTTP_404_NOT_FOUND)
