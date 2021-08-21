@@ -22,7 +22,7 @@ class SignupView(APIView):
 
         username = data['username']
         password = data['password']
-
+        
         if User.objects.filter(username=username).exists():
             return Response({'error': 'Username already exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
@@ -35,17 +35,9 @@ class SignupView(APIView):
             return Response({'token': token.key, 'username': username}, status=status.HTTP_201_CREATED)
 
 
-'''
-class CheckAuthenticatedView(APIView):
-    """
-       token set on header and check valid or not 
-    """
-'''
-
-
 class LoginView(APIView):
     """
-       In this view cleint must set token in header and post user and pass
+       View for login user and get generate user
     """
 
     permission_classes = (permissions.AllowAny,)
@@ -61,12 +53,13 @@ class LoginView(APIView):
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key})
         else:
-            return Response({'error': 'user is not auhtenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+            content = {'error': 'Username or Password is not true'}
+            return Response(content, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class LogoutView(APIView):
     """
-        This APi receives plain request, logs out the user who requested
+        This API receives plain request, logs out the user who requested
     """
 
     def post(self, request):
@@ -79,10 +72,9 @@ class LogoutView(APIView):
 
 
 class GetUserView(APIView):
-    # full name and access
-    # response full name and access
-    # token is not valid
-    #
+    """
+        For set user token to header and see token is valid or not and permissions of user
+    """
 
     permission_classes = (permissions.AllowAny,)
 
