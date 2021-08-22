@@ -140,3 +140,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #token expire date
 TOKEN_TTL = datetime.timedelta(days=2)
+
+
