@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User, Permission
+from . models import User
 from django.contrib import auth
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -22,7 +22,7 @@ class SignupView(APIView):
 
         username = data['username']
         password = data['password']
-        
+
         if User.objects.filter(username=username).exists():
             return Response({'error': 'Username already exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
@@ -63,9 +63,10 @@ class LogoutView(APIView):
     """
 
     def post(self, request):
+
         try:
-            auth.logout(request)
-            return Response({'success': 'logged out'})
+            request.user.auth_token.delete()
+            return Response({'message': 'logged out'})
         except:
             content = {'error': 'something went wrong while logging out'}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -95,8 +96,10 @@ class GetUserView(APIView):
                      "token_is_valid": token_is_valid})
             else:
                 content = {"error": "user does not exist "}
-                return Response(content,status=status.HTTP_401_UNAUTHORIZED)
+                return Response(content, status=status.HTTP_401_UNAUTHORIZED)
 
         except Token.DoesNotExist:
             content = {"error": "there is not any Token in data base"}
-            return Response(content,status=status.HTTP_404_NOT_FOUND)
+            return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+
