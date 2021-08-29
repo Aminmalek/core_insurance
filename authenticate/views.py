@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User, Permission
+from . models import User
 from django.contrib import auth
 from rest_framework import permissions, status
 from rest_framework.response import Response
