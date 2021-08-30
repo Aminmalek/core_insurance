@@ -1,8 +1,7 @@
 from django.db import models
 from django.db.models.deletion import CASCADE
-from django.shortcuts import render
-
 from authenticate.models import User
+
 
 class Vendor(models.Model):
 
