@@ -1,11 +1,7 @@
 from django.urls import path
-from .views import (SignupView, LoginView, LogoutView, GetUserView)
-
+from .views import InsuranceAddView
 
 urlpatterns = [
 
-    path('register', SignupView.as_view(), name="register"),
-    path('login', LoginView.as_view(), name="login"),
-    path('logout', LogoutView.as_view(), name="logout"),
-    path('get-user', GetUserView.as_view(), name="get-user"),
+    path('add-new-insurance/', InsuranceAddView.as_view(), name="AddNewInsurance"),
 ]
