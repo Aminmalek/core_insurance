@@ -17,7 +17,7 @@ class SignupView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-
+        
         data = request.data
 
         username = data['username']
@@ -82,8 +82,10 @@ class GetUserView(APIView):
     def get(self, request):
 
         try:
-            token = Token.objects.get(
-                key=request.META.get('HTTP_AUTHORIZATION'))
+            token_header=request.META.get('HTTP_AUTHORIZATION')
+            # Token in auth header set like this : Token 6354d54ffef4vfsfrgv5...
+            token_key = token_header[6:]
+            token = Token.objects.get(key=token_key)
             user = User.objects.get(auth_token=token)
 
             if user:
