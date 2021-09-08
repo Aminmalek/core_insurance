@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User, Permission
+from . models import User
 from django.contrib import auth
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -17,7 +17,7 @@ class SignupView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-
+        
         data = request.data
 
         username = data['username']
@@ -35,17 +35,9 @@ class SignupView(APIView):
             return Response({'token': token.key, 'username': username}, status=status.HTTP_201_CREATED)
 
 
-'''
-class CheckAuthenticatedView(APIView):
-    """
-       token set on header and check valid or not 
-    """
-'''
-
-
 class LoginView(APIView):
     """
-       In this view cleint must set token in header and post user and pass
+       View for login user and get generate user
     """
 
     permission_classes = (permissions.AllowAny,)
@@ -61,36 +53,39 @@ class LoginView(APIView):
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key})
         else:
-            return Response({'error': 'user is not auhtenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+            content = {'error': 'Username or Password is not true'}
+            return Response(content, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class LogoutView(APIView):
     """
-        This APi receives plain request, logs out the user who requested
+        This API receives plain request, logs out the user who requested
     """
 
     def post(self, request):
+
         try:
-            auth.logout(request)
-            return Response({'success': 'logged out'})
+            request.user.auth_token.delete()
+            return Response({'message': 'logged out'})
         except:
             content = {'error': 'something went wrong while logging out'}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class GetUserView(APIView):
-    # full name and access
-    # response full name and access
-    # token is not valid
-    #
+    """
+        For set user token to header and see token is valid or not and permissions of user
+    """
 
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request):
 
         try:
-            token = Token.objects.get(
-                key=request.META.get('HTTP_AUTHORIZATION'))
+            token_header=request.META.get('HTTP_AUTHORIZATION')
+            # Token in auth header set like this : Token 6354d54ffef4vfsfrgv5...
+            token_key = token_header[6:]
+            token = Token.objects.get(key=token_key)
             user = User.objects.get(auth_token=token)
 
             if user:
@@ -103,8 +98,10 @@ class GetUserView(APIView):
                      "token_is_valid": token_is_valid})
             else:
                 content = {"error": "user does not exist "}
-                return Response(content,status=status.HTTP_401_UNAUTHORIZED)
+                return Response(content, status=status.HTTP_401_UNAUTHORIZED)
 
         except Token.DoesNotExist:
             content = {"error": "there is not any Token in data base"}
-            return Response(content,status=status.HTTP_404_NOT_FOUND)
+            return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+
