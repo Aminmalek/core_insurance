@@ -1,4 +1,3 @@
-from typing import AbstractSet
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -21,9 +20,11 @@ class Type (models.Model):
         default=INSURED
     )
 
+
 class User(AbstractUser):
 
-    user_type = models.OneToOneField(Type,on_delete=models.PROTECT,blank=True, null=True)
-    
+    user_type = models.OneToOneField(
+        Type, on_delete=models.PROTECT, blank=True, null=True)
+
     def __str__(self):
         return self.username
