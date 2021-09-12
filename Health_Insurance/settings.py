@@ -46,8 +46,7 @@ INSTALLED_APPS = [
     'insured',
     'payment',
     'ticket',
-    'vendor',
-    
+    'vendor'
 ]
 
 MIDDLEWARE = [
@@ -109,7 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
-    
+
 ]
 
 REST_FRAMEWORK = {
@@ -145,5 +144,5 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Over rid django user 
+# Over rid django user
 AUTH_USER_MODEL = 'authenticate.User'
