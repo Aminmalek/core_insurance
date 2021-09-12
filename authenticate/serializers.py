@@ -14,10 +14,4 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'username', 'user_permissions')
-
-
-class UserTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Type
-        fields = ['id', 'type_name']
+        fields = ('id', 'first_name', 'last_name', 'username', 'user_permissions', 'user_type')
