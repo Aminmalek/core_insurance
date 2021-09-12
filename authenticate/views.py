@@ -86,7 +86,7 @@ class GetUserView(APIView):
             user = User.objects.get(auth_token=token)
             if user:
                 response_data = UserSerializer(user)
-                return Response({"user": response_data.data})
+                return Response(response_data.data)
             else:
                 content = {"error": "user does not exist "}
                 return Response(content, status=status.HTTP_401_UNAUTHORIZED)
