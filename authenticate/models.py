@@ -7,9 +7,10 @@ class Type (models.Model):
     COMPANY = 'CO'
     INSURED = 'IN'
     VENDOR = "VE"
-
+    HOLDER = "HO"
     TYPE_CHOICES = [
         (COMPANY, 'Company'),
+        (HOLDER, 'Holder'),
         (INSURED, 'Insured'),
         (VENDOR, 'Vendor'),
     ]
