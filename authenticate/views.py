@@ -1,11 +1,10 @@
-from . models import User
 from django.contrib import auth
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
-
 from .serializers import UserSerializer
+from .models import User
 
 
 class SignupView(APIView):
@@ -16,19 +15,14 @@ class SignupView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-
         data = request.data
-
         username = data['username']
         password = data['password']
-
         if User.objects.filter(username=username).exists():
             return Response({'error': 'Username already exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
-
         else:
             user = User.objects.create_user(
                 username=username, password=password)
-
             token = Token.objects.create(user=user)
             user.save()
             return Response({'token': token.key, 'username': username}, status=status.HTTP_201_CREATED)
@@ -42,12 +36,10 @@ class LoginView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-
         data = request.data
         username = data['username']
         password = data['password']
         user = auth.authenticate(username=username, password=password)
-
         if user:
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key})
@@ -62,9 +54,10 @@ class LogoutView(APIView):
     """
 
     def post(self, request):
-
         try:
-            request.user.auth_token.delete()
+            token = Token.objects.get(
+                key=request.META.get('HTTP_AUTHORIZATION'))
+            token.delete()
             return Response({'message': 'logged out'})
         except:
             content = {'error': 'something went wrong while logging out'}
@@ -76,13 +69,10 @@ class GetUserView(APIView):
         For set user token to header and see token is valid or not and permissions of user
     """
 
-    permission_classes = (permissions.AllowAny,)
-
     def get(self, request):
-
         try:
-            token = request.META.get('HTTP_AUTHORIZATION')
-            token = Token.objects.get(key=token)
+            token = Token.objects.get(
+                key=request.META.get('HTTP_AUTHORIZATION'))
             user = User.objects.get(auth_token=token)
             if user:
                 response_data = UserSerializer(user)
@@ -90,7 +80,6 @@ class GetUserView(APIView):
             else:
                 content = {"error": "user does not exist "}
                 return Response(content, status=status.HTTP_401_UNAUTHORIZED)
-
         except Token.DoesNotExist:
             content = {"error": "there is not any Token in data base"}
             return Response(content, status=status.HTTP_404_NOT_FOUND)
