@@ -10,7 +10,9 @@ from.serializers import TicketForCompanySerializer
 class CompanyTicketView(APIView):
 
     def get(self, request):
-
+        """
+        For view all tickets by company by status and acceptance of vendor
+        """
         data = request.data
         # I add [6:] because Token set to header like this Token e6r5g4e6r54ge
         token = Token.objects.get(
@@ -26,7 +28,10 @@ class CompanyTicketView(APIView):
             return Response(content, status=status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
-
+        """
+            This method is for posting username and activation status of vendor and active
+            or deactive him or her
+        """
         data = request.data
         # I add [6:] because Token set to header like this Token e6r5g4e6r54ge
         token = Token.objects.get(
@@ -36,7 +41,7 @@ class CompanyTicketView(APIView):
         if user.type == 'Company':
             ticket_company_status = bool(data['status'])
             ticket_id = data['ticket_id']
-            ticket_for_update = Ticket.objects.filter(id=ticket_id).update(
+            Ticket.objects.filter(id=ticket_id).update(
                 is_accepted_by_company=ticket_company_status)
             return Response({"message": "Ticket status updated successfuly by company"})
         else:
@@ -47,7 +52,9 @@ class CompanyTicketView(APIView):
 class VendorActivatedView(APIView):
 
     def post(self, request):
-
+        """
+            Company user can post username of vendor and see the activation status
+        """
         data = request.data
         # I add [6:] because Token set to header like this Token e6r5g4e6r54ge
         token = Token.objects.get(
@@ -64,7 +71,9 @@ class VendorActivatedView(APIView):
             return Response(content, status=status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
-
+        """
+            Company user can active or deactive the user by send username and new status 
+        """
         data = request.data
         # I add [6:] because Token set to header like this Token e6r5g4e6r54ge
         token = Token.objects.get(

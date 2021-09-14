@@ -10,7 +10,9 @@ from .models import Ticket
 class TicketView(APIView):
 
     def post(self, request):
-
+        """
+        For add new ticket by holder or insured
+        """
         data = request.data
         # I add [6:] because Token set to header like this Token e6r5g4e6r54ge
         token = Token.objects.get(

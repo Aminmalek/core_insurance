@@ -18,6 +18,7 @@ class TicketByVendorView(APIView):
         token = Token.objects.get(
             key=request.META.get('HTTP_AUTHORIZATION')[6:])
         user = User.objects.get(auth_token=token)
+
         if user.type == 'Vendor':
             ticket = Ticket.objects.all()
             serializer = TicketForVendorSerializer(ticket, many=True)
@@ -27,7 +28,9 @@ class TicketByVendorView(APIView):
             return Response(content, status=status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
-
+        """  
+        For change the status of ticket by vendor
+        """
         data = request.data
         # I add [6:] because Token set to header like this Token e6r5g4e6r54ge
         token = Token.objects.get(
