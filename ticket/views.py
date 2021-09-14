@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from authenticate.models import User
 from rest_framework.authtoken.models import Token
 from .models import Ticket
-from .serializers import TicketTypeSerializer
+
 
 
 class TicketView(APIView):
@@ -26,6 +26,7 @@ class TicketView(APIView):
         else:
             content = {"message": "you are not authenticated to do this"}
             return Response(content, status=status.HTTP_401_UNAUTHORIZED)
+
 # This methods can user here or in vendor app we can chanage it
 '''
     def get(self,request):
