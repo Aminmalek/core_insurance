@@ -6,5 +6,5 @@ class Ticket(models.Model):
     description = models.TextField(max_length=500)
     is_accepted_by_vendor = models.BooleanField(default=False)
     is_accepted_by_company = models.BooleanField(default=False)
-    has_withdrawed = models.BooleanField()
+    has_withdrawed = models.BooleanField(default=False)
     
