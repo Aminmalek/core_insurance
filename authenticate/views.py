@@ -55,9 +55,7 @@ class LogoutView(APIView):
 
     def post(self, request):
         try:
-            token = Token.objects.get(
-                key=request.META.get('HTTP_AUTHORIZATION'))
-            token.delete()
+            request.user.auth_token.delete()
             return Response({'message': 'logged out'})
         except:
             content = {'error': 'something went wrong while logging out'}
@@ -71,8 +69,8 @@ class GetUserView(APIView):
 
     def get(self, request):
         try:
-            token = Token.objects.get(
-                key=request.META.get('HTTP_AUTHORIZATION'))
+            token = request.META.get('HTTP_AUTHORIZATION')[6:]
+            token = Token.objects.get(key=token)
             user = User.objects.get(auth_token=token)
             if user:
                 response_data = UserSerializer(user)

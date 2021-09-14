@@ -15,8 +15,8 @@ class InsuredView(APIView):
     """
 
     def get(self, request):
-        token = Token.objects.get(
-            key=request.META.get('HTTP_AUTHORIZATION'))
+        token = request.META.get('HTTP_AUTHORIZATION')[6:]
+        token = Token.objects.get(key=token)
         user = User.objects.get(auth_token=token)
         if user.type == 'Company':
             insureds = Insured.objects.all()
@@ -37,8 +37,8 @@ class InsuredView(APIView):
 
     def put(self, request):
         data = request.data
-        token = Token.objects.get(
-            key=request.META.get('HTTP_AUTHORIZATION'))
+        token = request.META.get('HTTP_AUTHORIZATION')[6:]
+        token = Token.objects.get(key=token)
         user = User.objects.get(auth_token=token)
         if user.type == 'Company':
             user_id = data['user_id']
@@ -61,8 +61,8 @@ class InsuredView(APIView):
 
     def delete(self, request):
         data = request.data
-        token = Token.objects.get(
-            key=request.META.get('HTTP_AUTHORIZATION'))
+        token = request.META.get('HTTP_AUTHORIZATION')[6:]
+        token = Token.objects.get(key=token)
         user = User.objects.get(auth_token=token)
         if user.type == 'Company':
             user_id = data['user_id']
