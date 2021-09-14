@@ -26,7 +26,8 @@ class TicketView(APIView):
         else:
             content = {"message": "you are not authenticated to do this"}
             return Response(content, status=status.HTTP_401_UNAUTHORIZED)
-
+# This methods can user here or in vendor app we can chanage it
+'''
     def get(self,request):
         """
             For view all tickets by vendor
@@ -59,3 +60,4 @@ class TicketView(APIView):
         else:
             content = {"message": "you are not permited to do this action"}
             return Response(content, status=status.HTTP_401_UNAUTHORIZED)
+'''

@@ -1,8 +1,8 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from authenticate.models import User
 from rest_framework.authtoken.models import Token
+from authenticate.models import User
 from ticket.models import Ticket
 from ticket.serializers import TicketTypeSerializer
 
