@@ -10,9 +10,6 @@ from authenticate.models import User
 
 
 class InsuredView(APIView):
-    """
-        This api is used to handle full crud operations on insurance
-    """
 
     def get(self, request):
         token = Token.objects.get(

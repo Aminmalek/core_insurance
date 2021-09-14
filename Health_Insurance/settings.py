@@ -31,24 +31,29 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
+EXTERNAL_APPS = [
     'rest_framework.authtoken',
     'rest_framework',
     'corsheaders',
-    'authenticate',
+]
+
+LOCAL_APPS = [
+   'authenticate',
     'insurance',
     'insured',
     'payment',
     'ticket',
     'vendor'
 ]
-
+INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + LOCAL_APPS
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
