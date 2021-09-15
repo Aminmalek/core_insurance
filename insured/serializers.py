@@ -1,5 +1,7 @@
+from authenticate.serializers import UserSerializer
 from rest_framework import serializers
-from . models import Insured
+from .models import Insured
+from authenticate.models import User
 
 
 class InsuredSerializer(serializers.ModelSerializer):
@@ -16,5 +18,5 @@ class InsuredSerializer(serializers.ModelSerializer):
     class Meta:
         model = Insured
 
-        fields = ['id', 'user','username', 'first_name','insurance', 'is_holder',
+        fields = ['id', 'user', 'insurance',
                   'supported_insureds', 'bank_account_number']

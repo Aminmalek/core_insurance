@@ -12,9 +12,7 @@ from authenticate.models import User
 class InsuredView(APIView):
 
     def get(self, request):
-        token = Token.objects.get(
-            key=request.META.get('HTTP_AUTHORIZATION'))
-        user = User.objects.get(auth_token=token)
+        user = request.user
         if user.type == 'Company':
             insureds = Insured.objects.all()
             serializer = InsuredSerializer(insureds, many=True)
@@ -34,23 +32,17 @@ class InsuredView(APIView):
 
     def put(self, request):
         data = request.data
-        token = Token.objects.get(
-            key=request.META.get('HTTP_AUTHORIZATION'))
-        user = User.objects.get(auth_token=token)
+        user = request.user
         if user.type == 'Company':
             user_id = data['user_id']
             user = User.objects.get(id=user_id)
-        is_holder = bool(data['is_holder'])
         supported_insureds = data['supported_insureds']
         bank_account_number = data['bank_account_number']
         insured = Insured.objects.get(user=user)
-        if is_holder:
-            insured.is_holder = is_holder
         if supported_insureds:
             for id in supported_insureds:
                 user = User.objects.get(id=id)
-                new_insured = Insured.objects.get(user=user)
-                insured.supported_insureds.add(new_insured)
+                insured.supported_insureds.add(user)
         if bank_account_number:
             insured.bank_account_number = bank_account_number
         insured.save()
@@ -58,9 +50,7 @@ class InsuredView(APIView):
 
     def delete(self, request):
         data = request.data
-        token = Token.objects.get(
-            key=request.META.get('HTTP_AUTHORIZATION'))
-        user = User.objects.get(auth_token=token)
+        user = request.user
         if user.type == 'Company':
             user_id = data['user_id']
             user = User.objects.get(id=user_id)
