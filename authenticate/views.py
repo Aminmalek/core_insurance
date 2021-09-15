@@ -69,9 +69,7 @@ class GetUserView(APIView):
 
     def get(self, request):
         try:
-            token = request.META.get('HTTP_AUTHORIZATION')[6:]
-            token = Token.objects.get(key=token)
-            user = User.objects.get(auth_token=token)
+            user = request.user
             if user:
                 response_data = UserSerializer(user)
                 return Response(response_data.data)
