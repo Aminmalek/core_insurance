@@ -49,8 +49,7 @@ class InsuredView(APIView):
         if supported_insureds:
             for id in supported_insureds:
                 user = User.objects.get(id=id)
-                new_insured = Insured.objects.get(user=user)
-                insured.supported_insureds.add(new_insured)
+                insured.supported_insureds.add(user)
         if bank_account_number:
             insured.bank_account_number = bank_account_number
         insured.save()

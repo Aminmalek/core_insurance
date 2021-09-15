@@ -6,7 +6,7 @@ from authenticate.models import User
 
 class InsuredSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    supported_insureds = UserSerializer()
+    supported_insureds = UserSerializer(many=True)
 
     class Meta:
         model = Insured
