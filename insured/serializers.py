@@ -6,7 +6,7 @@ class InsuredSerializer(serializers.ModelSerializer):
 
     def get_user_name(self, obj):
         return obj.user.username
-
+    # This method used for other fields of user in serializers
     def get_first_name(self, obj):
         return obj.user.first_name
 

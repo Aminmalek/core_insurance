@@ -39,7 +39,7 @@ class TicketByVendorView(APIView):
         if user.type == 'Vendor':
             ticket_status = bool(data['status'])
             ticket_id = data['ticket_id']
-            ticket_for_update = Ticket.objects.filter(
+            Ticket.objects.filter(
                 id=ticket_id).update(is_accepted_by_vendor=ticket_status)
             return Response({"message": "Ticket status updated successfuly by vendor"})
         else:
