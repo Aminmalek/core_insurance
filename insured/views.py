@@ -15,9 +15,7 @@ class InsuredView(APIView):
     """
 
     def get(self, request):
-        token = request.META.get('HTTP_AUTHORIZATION')[6:]
-        token = Token.objects.get(key=token)
-        user = User.objects.get(auth_token=token)
+        user = request.user
         if user.type == 'Company':
             insureds = Insured.objects.all()
             serializer = InsuredSerializer(insureds, many=True)
@@ -37,9 +35,7 @@ class InsuredView(APIView):
 
     def put(self, request):
         data = request.data
-        token = request.META.get('HTTP_AUTHORIZATION')[6:]
-        token = Token.objects.get(key=token)
-        user = User.objects.get(auth_token=token)
+        user = request.user
         if user.type == 'Company':
             user_id = data['user_id']
             user = User.objects.get(id=user_id)
@@ -57,9 +53,7 @@ class InsuredView(APIView):
 
     def delete(self, request):
         data = request.data
-        token = request.META.get('HTTP_AUTHORIZATION')[6:]
-        token = Token.objects.get(key=token)
-        user = User.objects.get(auth_token=token)
+        user = request.user
         if user.type == 'Company':
             user_id = data['user_id']
             user = User.objects.get(id=user_id)

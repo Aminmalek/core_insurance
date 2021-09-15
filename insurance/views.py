@@ -19,9 +19,7 @@ class InsuranceView(APIView):
 
     def post(self, request):
         data = request.data
-        token = request.META.get('HTTP_AUTHORIZATION')[6:]
-        token = Token.objects.get(key=token)
-        user = User.objects.get(auth_token=token)
+        user = request.user
         if user.type == 'Company':
             name = data['name']
             description = data['description']
@@ -36,9 +34,7 @@ class InsuranceView(APIView):
 
     def put(self, request):
         data = request.data
-        token = request.META.get('HTTP_AUTHORIZATION')[6:]
-        token = Token.objects.get(key=token)
-        user = User.objects.get(auth_token=token)
+        user = request.user
         if user.type == 'Company':
             data = request.data
             insurance_id = data['id']
@@ -52,9 +48,7 @@ class InsuranceView(APIView):
 
     def delete(self, request):
         data = request.data
-        token = request.META.get('HTTP_AUTHORIZATION')[6:]
-        token = Token.objects.get(key=token)
-        user = User.objects.get(auth_token=token)
+        user = request.user
         if user.type == 'Company':
             data = request.data
             insurance_id = data['id']
