@@ -8,7 +8,6 @@ class Insured(models.Model):
         User, on_delete=models.PROTECT, null=False, blank=False)
     insurance = models.ForeignKey(
         InsuranceConnector, on_delete=models.CASCADE, null=True, blank=True)
-    is_holder = models.BooleanField(default=False)
-    supported_insureds = models.ForeignKey(
-        User, on_delete=models.CASCADE, null=True, blank=True, related_name="supported_insureds")
+    supported_insureds = models.ManyToManyField(
+        User, null=True, blank=True, related_name="supported_insureds")
     bank_account_number = models.IntegerField(null=True, blank=True)

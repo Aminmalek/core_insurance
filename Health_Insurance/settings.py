@@ -56,6 +56,7 @@ LOCAL_APPS = [
 ]
 INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + LOCAL_APPS
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -152,3 +153,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Over rid django user
 AUTH_USER_MODEL = 'authenticate.User'
+
+# cors config
+
+CORS_ORIGIN_ALLOW_ALL = True
