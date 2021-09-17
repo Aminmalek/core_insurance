@@ -13,10 +13,16 @@ class Payment(models.Model):
     is_successfull = models.BooleanField(default=False)
     payment_code = models.IntegerField()
 
+    def __str__(self):
+        return self.insurance.name
+
 
 class InsuranceConnector(models.Model):
-    insurance = models.OneToOneField(
+    insurance = models.ForeignKey(
         Insurance, on_delete=CASCADE, null=False, blank=False)
     is_accepted_by_company = models.BooleanField(default=False)
     payment = models.OneToOneField(
         Payment, on_delete=CASCADE, null=False, blank=False)
+
+    def __str__(self):
+        return self.insurance.name
