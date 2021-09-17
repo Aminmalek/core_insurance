@@ -1,5 +1,4 @@
 from django.contrib import admin
-from .models import Payment, InsuranceConnector
+from .models import InsuranceConnector
 
-admin.site.register(Payment)
 admin.site.register(InsuranceConnector)

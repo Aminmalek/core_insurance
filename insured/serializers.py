@@ -8,7 +8,7 @@ from .models import Insured
 class InsuredSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     supported_insureds = UserSerializer(many=True)
-    insurance = InsuranceConnectorSerializer()
+    insurance = InsuranceConnectorSerializer(many=True)
 
     class Meta:
         model = Insured
