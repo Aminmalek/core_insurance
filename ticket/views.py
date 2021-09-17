@@ -14,11 +14,7 @@ class TicketView(APIView):
         For add new ticket by holder or insured
         """
         data = request.data
-        # I add [6:] because Token set to header like this Token e6r5g4e6r54ge
-        token = Token.objects.get(
-            key=request.META.get('HTTP_AUTHORIZATION')[6:])
-        user = User.objects.get(auth_token=token)
-
+        user = request.user
         if user.type == 'Insured' or user.type == 'Holder':
             ticket_name = data['name']
             description = data['description']
@@ -34,11 +30,7 @@ class TicketView(APIView):
         """
             For view all tickets of insured or holder by user id
         """
-        # I add [6:] because Token set to header like this Token e6r5g4e6r54ge
-        token = Token.objects.get(
-            key=request.META.get('HTTP_AUTHORIZATION')[6:])
-        user = User.objects.get(auth_token=token)
-
+        user = request.user
         if user.type == 'Holder' or user.type == 'Insured':
             try:
                 # I used filter because user can have many tickits

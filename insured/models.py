@@ -7,7 +7,7 @@ class Insured(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.PROTECT, null=False, blank=False)
     supported_insureds = models.ManyToManyField(
-        User, null=True, blank=True, related_name="supported_insureds")
+        User, blank=True, related_name="supported_insureds")
     bank_account_number = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
