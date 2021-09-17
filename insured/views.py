@@ -1,4 +1,3 @@
-from insurance.models import Insurance
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from authenticate.models import User
@@ -17,10 +16,12 @@ class InsuredView(APIView):
             insureds = Insured.objects.all()
             serializer = InsuredSerializer(insureds, many=True)
             return Response(serializer.data)
-        else:
+        elif user.type == 'Insured' or user.type == "Holder":
             insured = Insured.objects.get(user=user)
             serializer = InsuredSerializer(insured)
             return Response(serializer.data)
+        else:
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
     def post(self, request):
         data = request.data
