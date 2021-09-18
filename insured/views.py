@@ -25,11 +25,19 @@ class InsuredView(APIView):
 
     def post(self, request):
         data = request.data
-        user_id = data['user_id']
-        insurance_id = data['insurance_id']
-        user = User.objects.get(id=user_id)
-        Insured.objects.create(user=user, insurance=insurance_id)
-        return Response({"message": "insured created successfuly"}, status=status.HTTP_201_CREATED)
+        user = request.user
+        if user.type != "Vendor" and user.type != None:
+            username = data['username']
+            password = data['password']
+            first_name = data['first_name']
+            last_name = data['last_name']
+            is_active = True
+            user = User.objects.create_user(username=username, password=password, first_name=first_name, last_name=last_name, is_active=is_active)
+            user.save()
+            Insured.objects.create(user=user)
+            if request.user.type == "Holder":
+                Insured.objects.get(user=request.user).supported_insureds.add(user)
+            return Response({"message": "insured created successfuly"}, status=status.HTTP_201_CREATED)
 
     def put(self, request):
         data = request.data
