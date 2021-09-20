@@ -1,3 +1,5 @@
+from django.contrib.auth.models import UserManager
+from authenticate import serializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -84,10 +86,16 @@ class VendorActivatedView(APIView):
             data = request.data
             vendor_username = data['vendor_username']
             vendor_activation_status = data['vendor_activation_status']
-            User.objects.filter(username=vendor_username).update(
-                is_active=vendor_activation_status)
-            # For see the vendor status after activation
-            #vendor = User.objects.get(username=vendor_username)
+
+            try:
+                vendor = User.objects.get(username=vendor_username)
+                vendor.is_active = vendor_activation_status
+                vendor.save()
+            except:
+                content = {
+                    "message": "There is no one with this username in the database"}
+                return Response(content, status=status.HTTP_404_NOT_FOUND)
+
             return Response({"message": "vendor activation status changed successfuly"})
         else:
             content = {"message": "you are not permited to do this action"}

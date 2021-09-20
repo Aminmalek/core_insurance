@@ -1,4 +1,4 @@
-from django.contrib import auth
+'''from django.contrib import auth
 from django.contrib.auth.models import User
 from django.test import Client
 
@@ -104,4 +104,5 @@ class Test(TestSetUp):
         # Must set token to header for get user data
         
 
-        self.assertEqual(response.status_code, 404, response_message)
+        self.assertEqual(response.status_code, 401)
+'''

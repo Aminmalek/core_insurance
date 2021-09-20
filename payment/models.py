@@ -7,7 +7,7 @@ from insurance.models import Insurance
 class InsuranceConnector(models.Model):
     user = models.ForeignKey(User, on_delete=CASCADE)
     insurance = models.ForeignKey(
-        Insurance, on_delete=CASCADE, null=False, blank=False)
+        Insurance, on_delete=CASCADE, null=True, blank=True)
     is_accepted_by_company = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
     payment_code = models.IntegerField(null=True, blank=True)
