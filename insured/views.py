@@ -21,14 +21,15 @@ class InsuredView(APIView):
             serializer = InsuredSerializer(insured)
             return Response(serializer.data)
         else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
 
     def post(self, request):
+        """
+        """
         data = request.data
         user_id = data['user_id']
-        insurance_id = data['insurance_id']
         user = User.objects.get(id=user_id)
-        Insured.objects.create(user=user, insurance=insurance_id)
+        Insured.objects.create(user=user)
         return Response({"message": "insured created successfuly"}, status=status.HTTP_201_CREATED)
 
     def put(self, request):
@@ -55,5 +56,8 @@ class InsuredView(APIView):
         if user.type == 'Company':
             user_id = data['user_id']
             user = User.objects.get(id=user_id)
-        insured = Insured.objects.get(user=user)
-        insured.delete()
+            insured = Insured.objects.get(user=user)
+            insured.delete()
+        else:
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({"message": "insured deleted successfuly"})

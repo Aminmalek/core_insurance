@@ -1,4 +1,4 @@
-'''from django.contrib import auth
+from django.contrib import auth
 from django.contrib.auth.models import User
 from django.test import Client
 
@@ -105,4 +105,3 @@ class Test(TestSetUp):
         
 
         self.assertEqual(response.status_code, 401)
-'''

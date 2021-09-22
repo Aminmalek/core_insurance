@@ -30,7 +30,7 @@ class InsuranceView(APIView):
             else:
                 return Response({"message": "insurance already exist"}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
         data = request.data
@@ -42,9 +42,9 @@ class InsuranceView(APIView):
             description = data['description']
             Insurance.objects.filter(id=insurance_id).update(
                 name=name, description=description)
-            return Response({"message": "insurance updated successfuly"}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"message": "insurance updated successfuly"}, status=status.HTTP_202_ACCEPTED)
         else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
 
     def delete(self, request):
         data = request.data
@@ -53,6 +53,6 @@ class InsuranceView(APIView):
             data = request.data
             insurance_id = data['id']
             Insurance.objects.filter(id=insurance_id).delete()
-            return Response({"message": "insurance deleted successfuly"}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"message": "insurance deleted successfuly"}, status=status.HTTP_202_ACCEPTED)
         else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
