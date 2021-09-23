@@ -2,8 +2,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 <<<<<<< HEAD
+<<<<<<< HEAD
 from . models import Ticket
 =======
+=======
+>>>>>>> fb40e6bdc5316f715e693ed11b4af823ad213b7e
 from .models import Ticket
 >>>>>>> fb40e6bdc5316f715e693ed11b4af823ad213b7e
 from . serializers import TicketSerializer
