@@ -1,9 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from authenticate.models import User
-from rest_framework.authtoken.models import Token
-from .models import Ticket
+from . models import Ticket
 from . serializers import TicketSerializer
 
 
@@ -11,7 +9,7 @@ class TicketView(APIView):
 
     def post(self, request):
         """
-        For add new ticket by holder or insured
+            For add new ticket by holder or insured
         """
         data = request.data
         user = request.user
