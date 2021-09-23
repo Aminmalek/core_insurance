@@ -1,7 +1,6 @@
 from insurance.models import Insurance
 from django.db import models
 from authenticate.models import User
-from payment.models import InsuranceConnector
 
 
 class Insured(models.Model):

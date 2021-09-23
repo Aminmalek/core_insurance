@@ -79,3 +79,30 @@ class GetUserView(APIView):
         except Token.DoesNotExist:
             content = {"error": "there is not any Token in data base"}
             return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+
+class UserView(APIView):
+    """
+        For getting user list and updating users
+    """
+    def get(self, request):
+        user = request.user
+        if user.type == "Company":
+            users = User.objects.all()
+            users = UserSerializer(users, many=True)
+            return Response(users.data)
+        else:
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
+
+    def put(self, request):
+        data = request.data
+        user = request.user
+        if user.type == "Company":
+            user = data['id']
+            is_active = data['is_active']
+            user = User.objects.get(id=user)
+            user.is_active = is_active
+            user.save()
+            return Response({"message": "user updated successfully"})
+        else:
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
