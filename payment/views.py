@@ -15,7 +15,7 @@ class InsuranceConnectorView(APIView):
                 insurance_connector, many=True)
             return Response(insurance_connector.data)
         else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
     def post(self, request):
         data = request.data
@@ -27,7 +27,7 @@ class InsuranceConnectorView(APIView):
                 user=user, insurance=insurance)
             return Response({"message": "insured created successfuly"}, status=status.HTTP_201_CREATED)
         else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
     def put(self, request):
         data = request.data
@@ -51,4 +51,4 @@ class InsuranceConnectorView(APIView):
             insurance_connector.save()
             return Response({"message": "insurance connector updated successfuly"}, status=status.HTTP_200_OK)
         else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)

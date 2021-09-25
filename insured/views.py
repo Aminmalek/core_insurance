@@ -21,11 +21,9 @@ class InsuredView(APIView):
             serializer = InsuredSerializer(insured)
             return Response(serializer.data)
         else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
     def post(self, request):
-        """
-        """
         data = request.data
         user = request.user
         if user.type != "Vendor" and user.type != None:
@@ -62,11 +60,17 @@ class InsuredView(APIView):
     def delete(self, request):
         data = request.data
         user = request.user
+        user_id = data['user_id']
+        user = User.objects.get(id=user_id)
+        insured = Insured.objects.get(user=user)
         if user.type == 'Company':
-            user_id = data['user_id']
-            user = User.objects.get(id=user_id)
-            insured = Insured.objects.get(user=user)
             insured.delete()
+        elif user.type == "Holder":
+            try:
+                insured.supported_insureds.remove(user)
+                insured.delete()
+            except:
+                return Response({"message": "you can not delete this insured"}, status=status.HTTP_403_FORBIDDEN)
         else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
         return Response({"message": "insured deleted successfuly"})

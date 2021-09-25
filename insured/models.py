@@ -9,6 +9,5 @@ class Insured(models.Model):
     supported_insureds = models.ManyToManyField(
         User, blank=True, related_name="supported_insureds")
     bank_account_number = models.IntegerField(null=True, blank=True)
-    insurance = models.ManyToManyField(InsuranceConnector ,blank=True)
     def __str__(self):
         return self.user.username
