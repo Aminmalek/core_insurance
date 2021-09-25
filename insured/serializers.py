@@ -13,5 +13,4 @@ class InsuredSerializer(serializers.ModelSerializer):
     class Meta:
         model = Insured
 
-        fields = ['id', 'user', 'insurance',
-                  'supported_insureds', 'bank_account_number']
+        fields = ['id', 'user', 'supported_insureds', 'bank_account_number']
