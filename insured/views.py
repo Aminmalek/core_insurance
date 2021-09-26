@@ -68,11 +68,13 @@ class InsuredView(APIView):
         user = User.objects.get(id=user_id)
         insured = Insured.objects.get(user=user)
         if user.type == 'Company':
+            user.delete()
             insured.delete()
         elif user.type == "Holder":
             try:
                 insured.supported_insureds.remove(user)
                 insured.delete()
+                user.delete()
             except:
                 return Response({"message": "you can not delete this insured"}, status=status.HTTP_403_FORBIDDEN)
         else:
