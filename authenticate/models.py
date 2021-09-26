@@ -7,9 +7,10 @@ class User(AbstractUser):
         ('Company', 'Company'),
         ('Vendor', 'Vendor'),
         ('Holder', 'Holder'),
+        ('SuperHolder', 'SuperHolder'),
         ('Insured', 'Insured'),
     ]
-    type = models.CharField(max_length=10, choices=TYPE_CHOICES)
-
+    type = models.CharField(max_length=11, choices=TYPE_CHOICES)
+    phone = models.IntegerField()
     def __str__(self):
         return self.username

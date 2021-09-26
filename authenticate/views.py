@@ -18,14 +18,17 @@ class SignupView(APIView):
         data = request.data
         username = data['username']
         password = data['password']
-        if User.objects.filter(username=username).exists():
-            return Response({'error': 'Username already exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+        first_name = data['first_name']
+        last_name = data['last_name']
+        phone = data['phone']
+        if User.objects.filter(username=username).exists() or User.objects.filter(phone=phone).exists():
+            return Response({'error': 'Username or Phone number already exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
         else:
-            user = User.objects.create_user(
-                username=username, password=password)
+            user = User.objects.create_user(username=username, password=password, first_name=first_name,
+                                            last_name=last_name, phone=phone, type='Insured')
             token = Token.objects.create(user=user)
             user.save()
-            return Response({'token': token.key, 'username': username}, status=status.HTTP_201_CREATED)
+            return Response({'token': token.key}, status=status.HTTP_201_CREATED)
 
 
 class LoginView(APIView):
@@ -85,6 +88,7 @@ class UserView(APIView):
     """
         For getting user list and updating users
     """
+
     def get(self, request):
         user = request.user
         if user.type == "Company":
