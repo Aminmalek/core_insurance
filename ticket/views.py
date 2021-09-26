@@ -12,7 +12,7 @@ class TicketView(APIView):
         user = request.user
         if user.type == 'Holder' or user.type == 'Insured':
             tickets = Ticket.objects.filter(user=user)
-        else:
+        elif user.type == 'Company':
             tickets = Ticket.objects.all()
 
         serializer = TicketSerializer(tickets, many=True)
@@ -35,21 +35,8 @@ class TicketView(APIView):
     def put(self, request):
         data = request.data
         user = request.user
-        if user.type == 'Insured' or user.type == 'Holder':
-            ticket_id = data['id']
-            ticket = Ticket.objects.get(id=ticket_id)
-            ticket.name = data['name']
-            ticket.description = data['description']
-            ticket.save()
-            return Response({"message": "Ticket updated successfuly"}, status=status.HTTP_200_OK)
-        elif user.type == 'Vendor':
-            ticket_id = data['id']
-            ticket = Ticket.objects.get(id=ticket_id)
-            ticket.is_accepted_by_vendor = data['is_accepted_by_vendor']
-            ticket.save()
-            return Response({"message": "Ticket updated successfuly"}, status=status.HTTP_200_OK)
-        elif user.type == 'Company':
-            ticket_id = data['id']
+        if user.type == 'Company':
+            ticket_id = data['ticket_id']
             ticket = Ticket.objects.get(id=ticket_id)
             ticket.is_accepted_by_company = data['is_accepted_by_company']
             ticket.save()
