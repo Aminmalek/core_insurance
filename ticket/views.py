@@ -7,6 +7,17 @@ from . serializers import TicketSerializer
 
 
 class TicketView(APIView):
+    
+    def get(self, request):
+        user = request.user
+        if user.type == 'Holder' or user.type == 'Insured':
+            tickets = Ticket.objects.filter(user=user)
+        else:
+            tickets = Ticket.objects.all()
+
+        serializer = TicketSerializer(tickets, many=True)
+        return Response(serializer.data)
+
     def post(self, request):
         data = request.data
         user = request.user
@@ -20,16 +31,6 @@ class TicketView(APIView):
         else:
             content = {"message": "you are not authenticated to do this"}
             return Response(content, status=status.HTTP_401_UNAUTHORIZED)
-
-    def get(self, request):
-        user = request.user
-        if user.type == 'Holder' or user.type == 'Insured':
-            tickets = Ticket.objects.filter(user=user)
-        else:
-            tickets = Ticket.objects.all()
-
-        serializer = TicketSerializer(tickets, many=True)
-        return Response(serializer.data)
 
     def put(self, request):
         data = request.data
