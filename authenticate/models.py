@@ -12,5 +12,7 @@ class User(AbstractUser):
     ]
     type = models.CharField(max_length=11, choices=TYPE_CHOICES)
     phone = models.IntegerField()
+    bank_account_number = models.IntegerField()
+
     def __str__(self):
         return self.username
