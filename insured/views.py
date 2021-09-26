@@ -50,14 +50,11 @@ class InsuredView(APIView):
             user_id = data['user_id']
             user = User.objects.get(id=user_id)
         supported_insureds = data['supported_insureds']
-        bank_account_number = data['bank_account_number']
         insured = Insured.objects.get(user=user)
         if supported_insureds:
             for id in supported_insureds:
                 user = User.objects.get(id=id)
                 insured.supported_insureds.add(user)
-        if bank_account_number:
-            insured.bank_account_number = bank_account_number
         insured.save()
         return Response({"message": "insured updated successfuly"})
 
