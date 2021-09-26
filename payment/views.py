@@ -1,3 +1,4 @@
+from authenticate.models import User
 from payment.serializers import InsuranceConnectorSerializer
 from insurance.models import Insurance
 from payment.models import InsuranceConnector
@@ -20,6 +21,9 @@ class InsuranceConnectorView(APIView):
     def post(self, request):
         data = request.data
         user = request.user
+        if user.type == "Insured":
+            user = User.objects.get(id=user.id).type = "Holder"
+            user.save()
         if user.type == "Holder":
             insurance_id = data['insurance']
             insurance = Insurance.objects.get(id=insurance_id)
