@@ -17,7 +17,7 @@ class InsuredView(APIView):
             serializer = InsuredSerializer(insureds, many=True)
             return Response(serializer.data)
         elif user.type == 'Insured' or user.type == "Holder":
-            insured = Insured.objects.get(user=user)
+            insured, created = Insured.objects.get_or_create(user=user)
             serializer = InsuredSerializer(insured)
             return Response(serializer.data)
         else:
