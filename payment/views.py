@@ -10,8 +10,14 @@ from rest_framework import status
 class InsuranceConnectorView(APIView):
     def get(self, request):
         user = request.user
-        if user.type != "Vendor" or user.type == None:
+        if user.type == "Company":
             insurance_connector = InsuranceConnector.objects.all()
+            insurance_connector = InsuranceConnectorSerializer(
+                insurance_connector, many=True)
+            return Response(insurance_connector.data)
+        elif user.type == "Holder" or user.type == "SuperHolder":
+            insurance_connector = InsuranceConnector.objects.filter(
+                user=user)
             insurance_connector = InsuranceConnectorSerializer(
                 insurance_connector, many=True)
             return Response(insurance_connector.data)
