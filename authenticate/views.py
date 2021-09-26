@@ -102,12 +102,12 @@ class UserView(APIView):
         data = request.data
         user = request.user
         if user.type == "Company":
-            user = data['id']
+            user = data['user_id']
             is_active = data['is_active']
             type = data['type']
             user = User.objects.get(id=user)
             if is_active:
-                user.is_active = is_active
+                user.is_active = True if is_active == "true" else False
             if type:
                 user.type = type
             user.save()
