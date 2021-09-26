@@ -1,3 +1,4 @@
+from authenticate.models import User
 from payment.serializers import InsuranceConnectorSerializer
 from insurance.models import Insurance
 from payment.models import InsuranceConnector
@@ -9,8 +10,14 @@ from rest_framework import status
 class InsuranceConnectorView(APIView):
     def get(self, request):
         user = request.user
-        if user.type != "Vendor" or user.type == None:
+        if user.type == "Company":
             insurance_connector = InsuranceConnector.objects.all()
+            insurance_connector = InsuranceConnectorSerializer(
+                insurance_connector, many=True)
+            return Response(insurance_connector.data)
+        elif user.type == "Holder" or user.type == "SuperHolder":
+            insurance_connector = InsuranceConnector.objects.filter(
+                user=user)
             insurance_connector = InsuranceConnectorSerializer(
                 insurance_connector, many=True)
             return Response(insurance_connector.data)
@@ -20,8 +27,11 @@ class InsuranceConnectorView(APIView):
     def post(self, request):
         data = request.data
         user = request.user
+        if user.type == "Insured":
+            user = User.objects.get(id=user.id).type = "Holder"
+            user.save()
         if user.type == "Holder":
-            insurance_id = data['insurance']
+            insurance_id = data['insurance_id']
             insurance = Insurance.objects.get(id=insurance_id)
             InsuranceConnector.objects.create(
                 user=user, insurance=insurance)
@@ -32,7 +42,7 @@ class InsuranceConnectorView(APIView):
     def put(self, request):
         data = request.data
         user = request.user
-        insurance_connector_id = data['insurance_connector']
+        insurance_connector_id = data['insurance_id']
         insurance_connector = InsuranceConnector.objects.get(
             id=insurance_connector_id)
         if user.type == "Holder":

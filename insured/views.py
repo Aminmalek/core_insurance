@@ -17,7 +17,7 @@ class InsuredView(APIView):
             serializer = InsuredSerializer(insureds, many=True)
             return Response(serializer.data)
         elif user.type == 'Insured' or user.type == "Holder":
-            insured = Insured.objects.get(user=user)
+            insured, created = Insured.objects.get_or_create(user=user)
             serializer = InsuredSerializer(insured)
             return Response(serializer.data)
         else:
@@ -26,17 +26,21 @@ class InsuredView(APIView):
     def post(self, request):
         data = request.data
         user = request.user
-        if user.type != "Vendor" and user.type != None:
+        if user.type == "Holder":
             username = data['username']
             password = data['password']
             first_name = data['first_name']
             last_name = data['last_name']
-            is_active = True
-            user = User.objects.create_user(username=username, password=password, first_name=first_name, last_name=last_name, is_active=is_active)
+            phone = data['phone']
+            if User.objects.filter(username=username).exists() or User.objects.filter(phone=phone).exists():
+                return Response({'error': 'Username or Phone number already exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            user = User.objects.create_user(username=username, password=password, first_name=first_name,
+                                            last_name=last_name, is_active=True, phone=phone, type='Insured')
             user.save()
             Insured.objects.create(user=user)
             if request.user.type == "Holder":
-                Insured.objects.get(user=request.user).supported_insureds.add(user)
+                Insured.objects.get(
+                    user=request.user).supported_insureds.add(user)
             return Response({"message": "insured created successfuly"}, status=status.HTTP_201_CREATED)
 
     def put(self, request):
@@ -64,11 +68,13 @@ class InsuredView(APIView):
         user = User.objects.get(id=user_id)
         insured = Insured.objects.get(user=user)
         if user.type == 'Company':
+            user.delete()
             insured.delete()
         elif user.type == "Holder":
             try:
                 insured.supported_insureds.remove(user)
                 insured.delete()
+                user.delete()
             except:
                 return Response({"message": "you can not delete this insured"}, status=status.HTTP_403_FORBIDDEN)
         else:

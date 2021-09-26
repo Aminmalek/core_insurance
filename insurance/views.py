@@ -51,7 +51,7 @@ class InsuranceView(APIView):
         user = request.user
         if user.type == 'Company':
             data = request.data
-            insurance_id = data['id']
+            insurance_id = data['insurance_id']
             Insurance.objects.filter(id=insurance_id).delete()
             return Response({"message": "insurance deleted successfuly"})
         else:
