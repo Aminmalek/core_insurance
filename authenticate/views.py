@@ -104,8 +104,12 @@ class UserView(APIView):
         if user.type == "Company":
             user = data['id']
             is_active = data['is_active']
+            type = data['type']
             user = User.objects.get(id=user)
-            user.is_active = is_active
+            if is_active:
+                user.is_active = is_active
+            if type:
+                user.type = type
             user.save()
             return Response({"message": "user updated successfully"})
         else:
