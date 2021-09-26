@@ -31,7 +31,7 @@ class InsuranceConnectorView(APIView):
             user = User.objects.get(id=user.id).type = "Holder"
             user.save()
         if user.type == "Holder":
-            insurance_id = data['insurance']
+            insurance_id = data['insurance_id']
             insurance = Insurance.objects.get(id=insurance_id)
             InsuranceConnector.objects.create(
                 user=user, insurance=insurance)
@@ -42,7 +42,7 @@ class InsuranceConnectorView(APIView):
     def put(self, request):
         data = request.data
         user = request.user
-        insurance_connector_id = data['insurance_connector']
+        insurance_connector_id = data['insurance_id']
         insurance_connector = InsuranceConnector.objects.get(
             id=insurance_connector_id)
         if user.type == "Holder":
