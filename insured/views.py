@@ -26,7 +26,7 @@ class InsuredView(APIView):
     def post(self, request):
         data = request.data
         user = request.user
-        if user.type != "Vendor" and user.type != None:
+        if user.type == "Holder":
             username = data['username']
             password = data['password']
             first_name = data['first_name']
