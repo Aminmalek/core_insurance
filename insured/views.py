@@ -31,12 +31,14 @@ class InsuredView(APIView):
             password = data['password']
             first_name = data['first_name']
             last_name = data['last_name']
-            is_active = True
-            user = User.objects.create_user(username=username, password=password, first_name=first_name, last_name=last_name, is_active=is_active)
+            phone = data['phone']
+            user = User.objects.create_user(username=username, password=password, first_name=first_name,
+                                            last_name=last_name, is_active=True, phone=phone, type='Insured')
             user.save()
             Insured.objects.create(user=user)
             if request.user.type == "Holder":
-                Insured.objects.get(user=request.user).supported_insureds.add(user)
+                Insured.objects.get(
+                    user=request.user).supported_insureds.add(user)
             return Response({"message": "insured created successfuly"}, status=status.HTTP_201_CREATED)
 
     def put(self, request):
