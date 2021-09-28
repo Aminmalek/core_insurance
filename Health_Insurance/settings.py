@@ -46,9 +46,10 @@ EXTERNAL_APPS = [
 ]
 
 LOCAL_APPS = [
-   'authenticate',
+    'authenticate',
     'insurance',
     'insured',
+    'super_holder',
     'payment',
     'ticket',
     'vendor',
