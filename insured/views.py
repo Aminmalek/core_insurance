@@ -31,10 +31,11 @@ class InsuredView(APIView):
             first_name = data['first_name']
             last_name = data['last_name']
             phone = data['phone']
+            bank_account_number = data['bank_account_number']
             if User.objects.filter(username=username).exists() or User.objects.filter(phone=phone).exists():
                 return Response({'error': 'Username or Phone number already exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
             user = User.objects.create_user(username=username, password=password, first_name=first_name,
-                                            last_name=last_name, is_active=True, phone=phone, type='Insured')
+                                            last_name=last_name, is_active=True, phone=phone, bank_account_number=bank_account_number, type='Insured')
             user.save()
             Insured.objects.create(user=user)
             if request.user.type == "Holder":
