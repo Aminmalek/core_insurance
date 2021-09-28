@@ -7,7 +7,7 @@ echo "installing requirements"
 call pip install -r requirements.txt
 
 echo "creating database"
-call python manage.py makemigrations authenticate insurance insured payment ticket vendor
+call python manage.py makemigrations authenticate insurance insured super_holder payment ticket vendor
 call python manage.py migrate
 
 echo "creating user"
