@@ -13,4 +13,7 @@ call python manage.py migrate
 echo "creating user"
 call python manage.py createsuperuser
 
+echo "seeding data"
+call python manage.py seed
+
 echo "done"
