@@ -4,8 +4,9 @@ from django.db.models.deletion import CASCADE
 
 
 class Insurance(models.Model):
-    name = models.CharField(max_length=150)
-    description = models.TextField(max_length=500)
+    name = models.CharField(max_length=20)
+    description = models.TextField(max_length=150)
+    price = models.IntegerField()
 
     def __str__(self):
         return self.name
