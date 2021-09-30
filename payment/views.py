@@ -42,7 +42,7 @@ class InsuranceConnectorView(APIView):
     def put(self, request):
         data = request.data
         user = request.user
-        insurance_connector_id = data['insurance_id']
+        insurance_connector_id = request.query_params['id']
         insurance_connector = InsuranceConnector.objects.get(
             id=insurance_connector_id)
         if user.type == "Holder":

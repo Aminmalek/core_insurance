@@ -102,7 +102,7 @@ class UserView(APIView):
         data = request.data
         user = request.user
         if user.type == "Company":
-            user = data['user_id']
+            user = request.query_params['id']
             is_active = data['is_active']
             type = data['type']
             user = User.objects.get(id=user)

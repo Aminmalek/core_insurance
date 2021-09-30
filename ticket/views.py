@@ -33,7 +33,7 @@ class TicketView(APIView):
         data = request.data
         user = request.user
         if user.type == 'Company':
-            ticket_id = data['ticket_id']
+            ticket_id = request.query_params['id']
             is_accepted_by_company = data['is_accepted_by_company']
             ticket = Ticket.objects.get(id=ticket_id)
             if is_accepted_by_company:

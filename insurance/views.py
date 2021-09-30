@@ -37,7 +37,7 @@ class InsuranceView(APIView):
         user = request.user
         if user.type == 'Company':
             data = request.data
-            insurance_id = data['insurance_id']
+            insurance_id = request.query_params['id']
             name = data['name']
             description = data['description']
             type = data['type']
@@ -49,12 +49,10 @@ class InsuranceView(APIView):
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request):
-        data = request.data
         user = request.user
         if user.type == 'Company':
-            data = request.data
-            insurance_id = data['insurance_id']
+            insurance_id = request.query_params['id']
             Insurance.objects.filter(id=insurance_id).delete()
-            return Response({"message": "insurance deleted successfuly"})
+            return Response({"message": "insurance deleted successfuly"}, status=status.HTTP_202_ACCEPTED)
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
