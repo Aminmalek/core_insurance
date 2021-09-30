@@ -1,10 +1,13 @@
 from django.db import models
-from django.db.models.base import Model
-from django.db.models.deletion import CASCADE
+
+TYPE_CHOICES = (
+    ('درمانی', 'درمانی'),
+)
 
 
 class Insurance(models.Model):
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=20, unique=True)
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     description = models.TextField(max_length=150)
     price = models.IntegerField()
 
