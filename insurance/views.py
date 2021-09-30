@@ -32,27 +32,33 @@ class InsuranceView(APIView):
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
-    def put(self, request):
+    def put(self, request, id):
         data = request.data
         user = request.user
         if user.type == 'Company':
             data = request.data
-            insurance_id = request.query_params['id']
             name = data['name']
             description = data['description']
             type = data['type']
             price = data['price']
-            Insurance.objects.filter(id=insurance_id).update(
-                name=name, description=description, type=type, price=price)
-            return Response({"message": "insurance updated successfuly"}, status=status.HTTP_202_ACCEPTED)
+            insurance = Insurance.objects.filter(id=id)
+            if insurance:
+                insurance.update(
+                    name=name, description=description, type=type, price=price)
+                return Response({"message": "insurance updated successfuly"}, status=status.HTTP_202_ACCEPTED)
+            else:
+                return Response({"message": "insurance doesn't exist"}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
-    def delete(self, request):
+    def delete(self, request, id):
         user = request.user
         if user.type == 'Company':
-            insurance_id = request.query_params['id']
-            Insurance.objects.filter(id=insurance_id).delete()
-            return Response({"message": "insurance deleted successfuly"}, status=status.HTTP_202_ACCEPTED)
+            insurance = Insurance.objects.filter(id=id)
+            if insurance:
+                Insurance.objects.get(id=id).delete()
+                return Response({"message": "insurance deleted successfuly"}, status=status.HTTP_202_ACCEPTED)
+            else:
+                return Response({"message": "insurance doesn't exist"}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
