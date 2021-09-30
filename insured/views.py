@@ -47,7 +47,7 @@ class InsuredView(APIView):
         data = request.data
         user = request.user
         if user.type == 'Company':
-            user_id = data['user_id']
+            user_id = request.query_params['id']
             user = User.objects.get(id=user_id)
         supported_insureds = data['supported_insureds']
         insured = Insured.objects.get(user=user)
@@ -61,7 +61,7 @@ class InsuredView(APIView):
     def delete(self, request):
         data = request.data
         user = request.user
-        user_id = data['user_id']
+        user_id = request.query_params['id']
         user = User.objects.get(id=user_id)
         insured = Insured.objects.get(user=user)
         if user.type == 'Company':

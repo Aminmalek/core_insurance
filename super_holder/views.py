@@ -50,7 +50,7 @@ class SuperHolderView(APIView):
         data = request.data
         user = request.user
         if user.type == 'Company':
-            user_id = data['user_id']
+            user_id = request.query_params['id']
             user = User.objects.get(id=user_id)
         supported_holders = data['supported_holders']
         insured = SuperHolder.objects.get(user=user)
@@ -65,7 +65,7 @@ class SuperHolderView(APIView):
         data = request.data
         user = request.user
         if request.user.type == 'Company' or request.user.type == 'SuperHolder':
-            user_id = data['user_id']
+            user_id = request.query_params['id']
             user = User.objects.get(id=user_id)
             insured = Insured.objects.get(user=user)
             if user.type == "SuperHolder":
