@@ -46,36 +46,42 @@ class SuperHolderView(APIView):
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
-    def put(self, request):
+    def put(self, request, id):
         data = request.data
         user = request.user
         if user.type == 'Company':
-            user_id = request.query_params['id']
-            user = User.objects.get(id=user_id)
+            user = User.objects.get(id=id)
         supported_holders = data['supported_holders']
-        insured = SuperHolder.objects.get(user=user)
+        super_holder = SuperHolder.objects.get(user=user)
         if supported_holders:
-            for id in supported_holders:
-                user = User.objects.get(id=id)
-                insured.supported_holders.add(user)
-        insured.save()
+            for supported_id in supported_holders:
+                user = User.objects.get(id=supported_id)
+                super_holder.supported_holders.add(user)
+        super_holder.save()
         return Response({"message": "super holder updated successfuly"})
 
-    def delete(self, request):
-        data = request.data
+    def delete(self, request, id):
         user = request.user
-        if request.user.type == 'Company' or request.user.type == 'SuperHolder':
-            user_id = request.query_params['id']
-            user = User.objects.get(id=user_id)
-            insured = Insured.objects.get(user=user)
-            if user.type == "SuperHolder":
-                try:
-                    insured.supported_holders.remove(user)
-                    insured.delete()
-                    user.delete()
-                except:
-                    return Response({"message": "you can not delete this holder"}, status=status.HTTP_403_FORBIDDEN)
+        if user.type == 'Company' or user.type == 'SuperHolder':
+            insured_user = User.objects.get(id=id)
+            if insured_user.type == 'Holder':
+                if Insured.objects.filter(user=insured_user).exists():
+                    insured = Insured.objects.get(user=insured_user)
+                    supported_holder = SuperHolder.objects.get(user=user)
+                    if user.type == "SuperHolder":
+                        try:
+                            supported_holder.supported_holders.remove(insured_user)
+                            insured.delete()
+                            insured_user.delete()
+                        except:
+                            return Response({"message": "you can only delete your supported holders"}, status=status.HTTP_403_FORBIDDEN)
+                    else:
+                        insured.delete()
+                        user.delete()
+                    return Response({"message": "Holder deleted successfuly"})
+                else:
+                    return Response({"message": "Holder does not exist"}, status=status.HTTP_404_NOT_FOUND)
             else:
-                insured.delete()
-                user.delete()
-            return Response({"message": "Holder deleted successfuly"})
+                return Response({"message": "you can only delete holders"}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)

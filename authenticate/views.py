@@ -98,14 +98,13 @@ class UserView(APIView):
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
-    def put(self, request):
+    def put(self, request, id):
         data = request.data
         user = request.user
         if user.type == "Company":
-            user = request.query_params['id']
             is_active = data['is_active']
             type = data['type']
-            user = User.objects.get(id=user)
+            user = User.objects.get(id=id)
             if is_active:
                 user.is_active = True if is_active == "true" else False
             if type:

@@ -28,7 +28,8 @@ class InsuranceConnectorView(APIView):
         data = request.data
         user = request.user
         if user.type == "Insured":
-            user = User.objects.get(id=user.id).type = "Holder"
+            user = User.objects.get(id=user.id)
+            user.type = "Holder"
             user.save()
         if user.type == "Holder":
             insurance_id = data['insurance_id']
@@ -39,12 +40,10 @@ class InsuranceConnectorView(APIView):
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
-    def put(self, request):
+    def put(self, request, id):
         data = request.data
         user = request.user
-        insurance_connector_id = request.query_params['id']
-        insurance_connector = InsuranceConnector.objects.get(
-            id=insurance_connector_id)
+        insurance_connector = InsuranceConnector.objects.get(id=id)
         if user.type == "Holder":
             is_paid = data['is_paid']
             payment_code = data['payment_code']
