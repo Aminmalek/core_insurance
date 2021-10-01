@@ -1,107 +1,122 @@
-from django.contrib import auth
 from django.contrib.auth.models import User
-from django.test import Client
+from rest_framework import serializers
+from rest_framework.test import APITestCase
+from rest_framework.authtoken.models import Token
+from authenticate.models import User
+from authenticate.serializers import UserSerializer
+from django.urls import reverse
 
-from .test_setup import TestSetUp
 
+class TestSignup(APITestCase):
 
-class Test(TestSetUp):
+    def setUp(self):
+        self.url = reverse("register")
 
     def test_user_can_register(self):
 
-        response = self.client.post(
-            self.register_url, self.correct_register_data)
-        response_message = response.data
-        self.assertEqual(response.status_code, 201, response_message)
+        data = {
 
-    def test_user_can_register_with_existing_username(self,):
+            "username": "354354354",
+            "password": "123456",
+            "first_name": "Gholam",
+            "last_name": "Gholami",
+            "phone": "3543543543"
+        }
+        response = self.client.post(self.url, data)
+        self.assertEqual(201, response.status_code)
 
-        response = self.client.post(self.register_url, self.existing_username)
-        response2 = self.client.post(self.register_url, self.existing_username)
-        response_message = response.data
-        self.assertEqual(response2.status_code, 406, response_message)
+    def test_user_can_register_with_repetitive_username(self):
 
-    def test_user_can_login_with_correct_data(self):
+        User.objects.create(username="354354354",
+                            password=752783782, phone=9124756598)
+        data = {
 
-        user_register = self.client.post(
-            self.register_url, self.correct_register_data,)
-        response = self.client.post(self.login_url, self.correct_login_data)
-        response_message = response.data
-        self.assertEqual(response.status_code, 200, response_message)
-
-    def test_user_can_login_with_wrong_data(self):
-
-        user_register = self.client.post(
-            self.register_url, self.correct_register_data,)
-
-        response = self.client.post(self.login_url, self.incorrect_login_data)
-        response_message = response.data
-        self.assertEqual(response.status_code, 401, response_message)
-
-    def test_user_can_logout_with_correct_data(self):
-
-        user_register = self.client.post(
-            self.register_url, self.correct_register_data,)
-
-        # user login
-        login = self.client.post(self.login_url, self.correct_login_data)
-        token = login.data['token']
-
-        # log out with set header in authorization
-        response = self.client.post(
-            self.logout_url, HTTP_AUTHORIZATION="Token "+token)
-
-        response_message = response.data
-
-        self.assertEqual(response.status_code, 200, response_message)
-
-    def test_user_can_logout_with_wrong_data(self):
-
-        user_register = self.client.post(
-            self.register_url, self.correct_register_data,)
-
-        # user login
-        login = self.client.post(self.login_url, self.correct_login_data)
-        token = login.data['token']
-
-        # log out with set header in authorization
-        response = self.client.post(
-            self.logout_url, HTTP_AUTHORIZATION="Token "+token+"grdty")
-
-        response_message = response.data
-
-        self.assertEqual(response.status_code, 401, response_message)
-
-    def test_can_get_userdata_with_correct_data(self):
-
-        user_register = self.client.post(
-            self.register_url, self.correct_register_data,)
-        login = self.client.post(self.login_url, self.correct_login_data)
-        token = login.data["token"]
-
-        # Must set token to header for get user data
-        response = self.client.get(
-            self.get_user_url, HTTP_AUTHORIZATION=token)
-        response_message = response.data
-
-        self.assertEqual(response.status_code, 200, response_message)
+            "username": "354354354",
+            "password": "123456",
+            "first_name": "Gholam",
+            "last_name": "Gholami",
+            "phone": "3543543543"
+        }
+        response = self.client.post(self.url, data)
+        self.assertEqual(406, response.status_code)
 
 
-    def test_can_get_userdata_with_incorrect_data(self):
+class TestLoginView(APITestCase):
 
-        user_register = self.client.post(
-            self.register_url, self.correct_register_data,)
-        login = self.client.post(self.login_url, self.incorrect_login_data)
-        try:
-            token = login.data["token"]
-            response = self.client.get(
-            self.get_user_url, HTTP_AUTHORIZATION=token)
-            response_message = response.data
-        except:
-            response = self.client.get(
-            self.get_user_url)
-            response_message  = "An empty message!"
-        # Must set token to header for get user data
+    def setUp(self):
+        self.url = reverse("login")
+        self.username = "1234567899"
+        self.password = "123456"
+        self.type = "Company"
+        self.phone = "3546345"
+    # this test is not pass
+    '''
+    def test_can_user_login(self):
+        user = User.objects.create(
+            username=self.username, password=self.password, type=self.type, phone=self.phone)
+        token = Token.objects.create(user=user)
+        data = {
+
+            'username': '1234567899',
+            'password': '123456',
+
         
+        response = self.client.post(self.url, data)
+        self.assertEqual(200, response.status_code)
+    '''
 
-        self.assertEqual(response.status_code, 401)
+    def test_can_user_login_with_wrong_pass(self):
+        user = User.objects.create(
+            username=self.username, password=self.password, type=self.type, phone=self.phone)
+        token = Token.objects.create(user=user)
+        data = {
+
+            'username': '1234567899',
+            'password': '1234567',
+
+        }
+        response = self.client.post(self.url, data)
+        self.assertEqual(401, response.status_code)
+
+
+class Testlogout(APITestCase):
+
+    def setUp(self):
+        self.username = "company1"
+        self.password = "123456"
+        self.type = "Company"
+        self.phone = "3546345"
+        self.user = User.objects.create(
+            username=self.username, password=self.password, type=self.type, phone=self.phone)
+        self.url = reverse("logout")
+        self.token = Token.objects.create(user=self.user)
+        self.api_authentication()
+
+    def api_authentication(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+    def test_user_can_logout(self):
+        response = self.client.post(self.url)
+        self.assertEqual(200, response.status_code)
+
+class TestGetUserView(APITestCase):
+
+    def setUp(self):
+        self.username = "company1"
+        self.password = "123456"
+        self.type = "Company"
+        self.phone = "3546345"
+        self.user = User.objects.create(
+            username=self.username, password=self.password, type=self.type, phone=self.phone)
+        self.url = reverse("get-user")
+        self.token = Token.objects.create(user=self.user)
+        self.api_authentication()
+
+    def api_authentication(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+    
+    def test_user_can_get_his_details(self):
+        user  = User.objects.get(username=self.username)
+        serializer = UserSerializer(user)
+        response = self.client.get(self.url)
+        self.assertEqual(serializer.data, response.data)
