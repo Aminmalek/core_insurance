@@ -29,13 +29,12 @@ class TicketView(APIView):
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
-    def put(self, request):
+    def put(self, request, id):
         data = request.data
         user = request.user
         if user.type == 'Company':
-            ticket_id = request.query_params['id']
             is_accepted_by_company = data['is_accepted_by_company']
-            ticket = Ticket.objects.get(id=ticket_id)
+            ticket = Ticket.objects.get(id=id)
             if is_accepted_by_company:
                 ticket.is_accepted_by_company = True if is_accepted_by_company == 'true' else False
             ticket.save()
