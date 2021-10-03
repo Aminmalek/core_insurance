@@ -91,13 +91,17 @@ WSGI_APPLICATION = 'Health_Insurance.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# add postgresql database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'dce4fg9oqeb3sh',
+        'USER': 'hvieuepruquicu',
+        'PASSWORD': '0e3bd7ef06fdc75876dd50db67fb7b23dcc97004d85d836860e6a64770bb236f',
+        'HOST': 'ec2-54-155-226-153.eu-west-1.compute.amazonaws.com',
+        'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -156,5 +160,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'authenticate.User'
 
 # cors config
-
 CORS_ORIGIN_ALLOW_ALL = True
