@@ -10,6 +10,8 @@ class Insurance(models.Model):
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     description = models.TextField(max_length=150)
     price = models.IntegerField()
+    register_form = models.JSONField()
+    claim_form = models.JSONField()
 
     def __str__(self):
         return self.name

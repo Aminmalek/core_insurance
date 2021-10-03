@@ -11,10 +11,9 @@ CLAIM_STATUS_CHOICES = (
 
 
 class Ticket(models.Model):
-
-    name = models.CharField(max_length=150)
     user = models.ForeignKey(
         User, on_delete=models.PROTECT, null=True, blank=True)
+    name = models.CharField(max_length=150)
     description = models.TextField(max_length=500)
     is_accepted_by_vendor = models.BooleanField(default=False)
     is_accepted_by_company = models.BooleanField(default=False)
@@ -25,12 +24,15 @@ class Ticket(models.Model):
 
 
 class Claim(models.Model):
-    title = models.CharField(max_length=100)
-    insurnace = models.ForeignKey(
+    user = models.ForeignKey(
+        User, on_delete=models.PROTECT, null=True, blank=True)
+    insurance = models.ForeignKey(
         InsuranceConnector, on_delete=models.DO_NOTHING)
+    title = models.CharField(max_length=100)
     status = models.CharField(max_length=10, choices=CLAIM_STATUS_CHOICES)
-    description = models.TextField(max_length=500)
     response = models.TextField(max_length=500)
+    claim_form = models.JSONField()
+    is_archived = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
