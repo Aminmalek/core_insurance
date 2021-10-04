@@ -1,8 +1,16 @@
 from django.db import models
+from django.db.models.fields import CharField
 from authenticate.models import User
 from payment.models import InsuranceConnector
 
 CLAIM_STATUS_CHOICES = (
+    ('Opened', 'Opened'),
+    ('Reopened', 'Reopened'),
+    ('Approved', 'Approved'),
+    ('Rejected', 'Rejected'),
+)
+
+TICKET_STATUS_CHOICES = (
     ('Opened', 'Opened'),
     ('Reopened', 'Reopened'),
     ('Approved', 'Approved'),
@@ -15,9 +23,7 @@ class Ticket(models.Model):
         User, on_delete=models.PROTECT, null=True, blank=True)
     name = models.CharField(max_length=150)
     description = models.TextField(max_length=500)
-    is_accepted_by_vendor = models.BooleanField(default=False)
-    is_accepted_by_company = models.BooleanField(default=False)
-    has_withdrawed = models.BooleanField(default=False)
+    status = models.CharField(max_length=10, choices=TICKET_STATUS_CHOICES)
 
     def __str__(self):
         return self.name
