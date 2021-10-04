@@ -43,6 +43,8 @@ class LoginView(APIView):
         username = data['username']
         password = data['password']
         user = auth.authenticate(username=username, password=password)
+        #this makes tests pass
+        #user = User.objects.get(username=username,password=password)
         if user:
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key})
