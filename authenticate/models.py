@@ -11,7 +11,7 @@ class User(AbstractUser):
         ('Insured', 'Insured'),
     ]
     type = models.CharField(max_length=11, choices=TYPE_CHOICES)
-    phone = models.IntegerField(null=True)
+    phone = models.BigIntegerField()
     bank_account_number = models.CharField(max_length=26)
 
     REQUIRED_FIELDS = ['phone', 'bank_account_number']

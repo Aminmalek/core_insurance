@@ -43,27 +43,24 @@ class InsuredView(APIView):
                     user=request.user).supported_insureds.add(user)
             return Response({"message": "insured created successfuly"}, status=status.HTTP_201_CREATED)
 
-    def put(self, request):
+    def put(self, request, id):
         data = request.data
         user = request.user
         if user.type == 'Company':
-            user_id = request.query_params['id']
-            user = User.objects.get(id=user_id)
+            user = User.objects.get(id=id)
         supported_insureds = data['supported_insureds']
         insured = Insured.objects.get(user=user)
         if supported_insureds:
-            for id in supported_insureds:
-                user = User.objects.get(id=id)
+            for insured_id in supported_insureds:
+                user = User.objects.get(id=insured_id)
                 insured.supported_insureds.add(user)
         insured.save()
         return Response({"message": "insured updated successfuly"})
 
-    def delete(self, request):
-        data = request.data
+    def delete(self, request, id):
         user = request.user
-        user_id = request.query_params['id']
-        user = User.objects.get(id=user_id)
-        insured = Insured.objects.get(user=user)
+        user_id = User.objects.get(id=id)
+        insured = Insured.objects.get(user=user_id)
         if user.type == 'Company':
             user.delete()
             insured.delete()

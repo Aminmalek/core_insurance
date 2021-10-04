@@ -1,4 +1,5 @@
 from authenticate.models import User
+from insured.models import Insured
 from payment.serializers import InsuranceConnectorSerializer
 from insurance.models import Insurance
 from payment.models import InsuranceConnector
@@ -21,6 +22,13 @@ class InsuranceConnectorView(APIView):
             insurance_connector = InsuranceConnectorSerializer(
                 insurance_connector, many=True)
             return Response(insurance_connector.data)
+        elif user.type == "Insured":
+            parent = Insured.objects.get(supported_insureds=user)
+            insurance_connector = InsuranceConnector.objects.filter(
+                user=parent.user)
+            insurance_connector = InsuranceConnectorSerializer(
+                insurance_connector, many=True)
+            return Response(insurance_connector.data)
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
@@ -28,23 +36,23 @@ class InsuranceConnectorView(APIView):
         data = request.data
         user = request.user
         if user.type == "Insured":
-            user = User.objects.get(id=user.id).type = "Holder"
+            user = User.objects.get(id=user.id)
+            user.type = "Holder"
             user.save()
         if user.type == "Holder":
             insurance_id = data['insurance_id']
+            register_form = data['register_form']
             insurance = Insurance.objects.get(id=insurance_id)
             InsuranceConnector.objects.create(
-                user=user, insurance=insurance)
+                user=user, insurance=insurance, register_form=register_form)
             return Response({"message": "insured created successfuly"}, status=status.HTTP_201_CREATED)
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
-    def put(self, request):
+    def put(self, request, id):
         data = request.data
         user = request.user
-        insurance_connector_id = request.query_params['id']
-        insurance_connector = InsuranceConnector.objects.get(
-            id=insurance_connector_id)
+        insurance_connector = InsuranceConnector.objects.get(id=id)
         if user.type == "Holder":
             is_paid = data['is_paid']
             payment_code = data['payment_code']
