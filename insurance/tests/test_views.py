@@ -12,8 +12,9 @@ class InsuranceTests(APITestCase):
         self.username = "company1"
         self.password = "123456"
         self.type = "Company"
+        self.phone = 9128754652
         self.user = User.objects.create(
-            username=self.username, password=self.password, type=self.type)
+            username=self.username, password=self.password, type=self.type,phone=self.phone)
         self.url = reverse("insurance")
         self.token = Token.objects.create(user=self.user)
         self.api_authentication()
@@ -28,7 +29,7 @@ class InsuranceTests(APITestCase):
 
     def test_user_copmany_can_post_insurances(self):
         data = {"name": "some insurance!",
-                "description": "this is an insurance"}
+                "description": "this is an insurance","price":587}
         response = self.client.post(self.url, data)
         self.assertEqual(
             {"message": "insurance created successfuly"}, response.data)
@@ -40,26 +41,26 @@ class InsuranceTests(APITestCase):
         new_token = Token.objects.create(user=none_company_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
         data = {"name": "some insurance!",
-                "description": "this is an insurance but i'm not companyyy!"}
+                "description": "this is an insurance but i'm not companyyy!","price":587}
         response = self.client.post(self.url, data)
-        self.assertEqual(401, response.status_code)
+        self.assertEqual(403, response.status_code)
 
     def test_user_copmany_can_post_duplicate_insurances(self):
 
         Insurance.objects.create(
-            name="some insurance!", description="this is an insurance")
+            name="some insurance!", description="this is an insurance",price=65465)
         data = {"name": "some insurance!",
-                "description": "this is an insurance"}
+                "description": "this is an insurance","price":5754}
         response = self.client.post(self.url, data)
         self.assertEqual(400, response.status_code)
 
     def test_user_copmany_can_update_insurances(self):
 
         Insurance.objects.create(
-            name="some insurance!", description="this is an insurance")
+            name="some insurance!", description="this is an insurance",price=25475)
         data = {"id": 1, "name": "some thing",
-                "description": "this is an updated insurance !"}
-        response = self.client.put(self.url, data)
+                "description": "this is an updated insurance !","price":6854654}
+        response = self.client.put('/api/insurance/1', data)
         self.assertEqual(202, response.status_code)
 
     def test_user_none_copmany_can_update_insurances(self):
@@ -70,17 +71,16 @@ class InsuranceTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
         Insurance.objects.create(
             name="some insurance!", description="this is an insurance")
-        data = {"id": 1, "name": "some thing",
-                "description": "this is an updated insurance !"}
-        response = self.client.put(self.url, data)
-        self.assertEqual(401, response.status_code)
+        data = { "name": "some thing",
+                "description": "this is an updated insurance !","price":654}
+        response = self.client.put('/api/insurance/1', data)
+        self.assertEqual(403, response.status_code)
 
     def test_user_copmany_can_delete_insurances(self):
 
         Insurance.objects.create(
             name="some insurance!", description="this is an insurance")
-        data = {"id": 1}
-        response = self.client.delete(self.url, data)
+        response = self.client.delete('/api/insurance/1')
         self.assertEqual(202, response.status_code)
 
     def test_user_none_copmany_can_delete_insurances(self):
@@ -91,6 +91,6 @@ class InsuranceTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
         Insurance.objects.create(
             name="some insurance!", description="this is an insurance")
-        data = {"id": 1}
-        response = self.client.delete(self.url, data)
-        self.assertEqual(401, response.status_code)
+        
+        response = self.client.delete('/api/insurance/1')
+        self.assertEqual(403, response.status_code)

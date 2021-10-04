@@ -29,7 +29,6 @@ class InsuranceView(APIView):
         if user.type == 'Company':
             name = data['name']
             description = data['description']
-            type = data['type']
             price = data['price']
             register_form = data['register_form']
             claim_form = data['claim_form']
@@ -49,14 +48,17 @@ class InsuranceView(APIView):
             data = request.data
             name = data['name']
             description = data['description']
-            type = data['type']
             price = data['price']
             register_form = data['register_form']
             claim_form = data['claim_form']
             insurance = Insurance.objects.filter(id=id)
             if insurance:
                 insurance.update(
+<<<<<<< HEAD
+                    name=name, description=description, price=price)
+=======
                     name=name, description=description, type=type, price=price, register_form=register_form, claim_form=claim_form)
+>>>>>>> develop
                 return Response({"message": "insurance updated successfuly"}, status=status.HTTP_202_ACCEPTED)
             else:
                 return Response({"message": "insurance doesn't exist"}, status=status.HTTP_400_BAD_REQUEST)
