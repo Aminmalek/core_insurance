@@ -70,7 +70,8 @@ class SuperHolderView(APIView):
                     supported_holder = SuperHolder.objects.get(user=user)
                     if user.type == "SuperHolder":
                         try:
-                            supported_holder.supported_holders.remove(insured_user)
+                            supported_holder.supported_holders.remove(
+                                insured_user)
                             insured.delete()
                             insured_user.delete()
                         except:
