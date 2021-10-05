@@ -112,9 +112,19 @@ class SuperHolderTests(APITestCase):
         }
         response = self.client.post(self.url, data)
         #supports = super_holder.supported_holders
-        self.assertEqual(
-            403, response.status_code)
+        self.assertEqual(403, response.status_code)
 
+    def test_superholder_add_holder(self):
+        user = User.objects.create(
+            username="super1", password="123456", type="SuperHolder")
+        super_holder = SuperHolder.objects.create(user=user)
+        new_token = Token.objects.create(user=user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
+        user2 = User.objects.create(username='001245789', password='123456',type="Holder")
+        user3 = User.objects.create(username='021654654', password='123456',type="Holder")
+        data = {"supported_holders": "10"}
+        response = self.client.put('/api/superholder', data)
+        self.assertEqual(200, response.status_code)
     '''
     def test_none_company_user_can_delete_insureds(self):
         company_user = User.objects.create(

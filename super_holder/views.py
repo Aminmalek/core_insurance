@@ -46,17 +46,17 @@ class SuperHolderView(APIView):
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
-    def put(self, request, id):
+    def put(self, request,):
+        # This method must change in better way A.
         data = request.data
         user = request.user
+        supported_holders = data['supported_holders']
         if user.type == 'Company':
             user = User.objects.get(id=id)
-        supported_holders = data['supported_holders']
         super_holder = SuperHolder.objects.get(user=user)
         if supported_holders:
-            for supported_id in supported_holders:
-                user = User.objects.get(id=supported_id)
-                super_holder.supported_holders.add(user)
+            user = User.objects.get(id=supported_id)
+            super_holder.supported_holders.add(user)
         super_holder.save()
         return Response({"message": "super holder updated successfuly"})
 

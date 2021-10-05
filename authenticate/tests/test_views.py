@@ -99,6 +99,7 @@ class Testlogout(APITestCase):
         response = self.client.post(self.url)
         self.assertEqual(200, response.status_code)
 
+
 class TestGetUserView(APITestCase):
 
     def setUp(self):
@@ -114,12 +115,13 @@ class TestGetUserView(APITestCase):
 
     def api_authentication(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-    
+
     def test_user_can_get_his_details(self):
-        user  = User.objects.get(username=self.username)
+        user = User.objects.get(username=self.username)
         serializer = UserSerializer(user)
         response = self.client.get(self.url)
         self.assertEqual(serializer.data, response.data)
+
 
 class TestUserView(APITestCase):
 
@@ -136,60 +138,70 @@ class TestUserView(APITestCase):
 
     def api_authentication(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-    
+
     def test_copmany_user_can_view_users(self):
-        User.objects.create(username=687654654654,password=12345678,phone=912456887)
-        User.objects.create(username=96865416354,password=12345678,phone=9198754612)
+        User.objects.create(username=687654654654,
+                            password=12345678, phone=912456887)
+        User.objects.create(username=96865416354,
+                            password=12345678, phone=9198754612)
         user = User.objects.all()
-        serializer = UserSerializer(user,many=True)
+        serializer = UserSerializer(user, many=True)
         response = self.client.get(self.url)
         self.assertEqual(serializer.data, response.data)
-    
+
     def test_none_copmany_user_can_view_users(self):
         new_user = User.objects.create(
-            username=8751684, 
-            password=123456, 
-            type="Insured", 
+            username=8751684,
+            password=123456,
+            type="Insured",
             phone=9104565789
-            )
-       
+        )
+
         token = Token.objects.create(user=new_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
-        User.objects.create(username=687654654654,password=12345678,phone=912456887)
-        User.objects.create(username=96865416354,password=12345678,phone=9198754612)
+        User.objects.create(username=687654654654,
+                            password=12345678, phone=912456887)
+        User.objects.create(username=96865416354,
+                            password=12345678, phone=9198754612)
         user = User.objects.all()
-        serializer = UserSerializer(user,many=True)
+        serializer = UserSerializer(user, many=True)
         response = self.client.get(self.url)
         self.assertEqual(403, response.status_code)
 
     def test_company_user_can_update_user_data(self):
-        User.objects.create(username=687654654654,password=12345678,phone=912456887,type="Vendor")
-        user = User.objects.get(username=687654654654)
+        User.objects.create(username=6874654654, password=12345678,
+                            phone=912456887, type="Vendor", is_active=False)
+        User.objects.filter(username=6874654654).update(id=123)
+        
         data = {
-            "is_active" : True,
-            "type" : "Insured"
+            "is_active": "true",
+            "type": "Insured"
         }
+        response = self.client.put("/api/auth/user/123", data)
+        user = User.objects.get(username=6874654654)
         types = user.type
-        response = self.client.put("/api/auth/user?id=1",data)
-        self.assertEquals(types,"Vendor")
+        self.assertEquals(user.is_active, True)
+        self.assertEquals(types,"Insured")
+        
 
     def test_none_company_user_can_update_user_data(self):
         new_user = User.objects.create(
-            username=8751684, 
-            password=123456, 
-            type="Insured", 
+            username=8751684,
+            password=123456,
+            type="Insured",
             phone=9104565789
-            )
-       
+        )
+
         token = Token.objects.create(user=new_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
-        user = User.objects.create(username=687654654654,password=12345678,phone=912456887,type="Vendor")
+        user = User.objects.create(
+            username=687654654654, password=12345678, phone=912456887, type="Vendor")
         data = {
-            "is_active" : True,
-            "type" : "Insured"
+            "is_active": True,
+            "type": "Insured"
         }
-        response = self.client.put("/api/auth/user?id=1",data)
-        
+        response = self.client.put("/api/auth/user/1", data)
+
         self.assertEquals(403, response.status_code,)
