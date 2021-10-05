@@ -23,7 +23,7 @@ class Ticket(models.Model):
         User, on_delete=models.PROTECT, null=True, blank=True)
     name = models.CharField(max_length=150)
     description = models.TextField(max_length=500)
-    status = models.CharField(max_length=10, choices=TICKET_STATUS_CHOICES)
+    status = models.CharField(max_length=10, choices=TICKET_STATUS_CHOICES,null=True)
 
     def __str__(self):
         return self.name
