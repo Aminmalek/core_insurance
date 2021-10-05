@@ -63,9 +63,10 @@ class ClaimView(APIView):
             title = data['title']
             insurance_id = data['insurance']
             claim_form = data['claim_form']
+            description = data['description']
             insurance = InsuranceConnector.objects.get(id=insurance_id)
             Claim.objects.create(
-                user=user, title=title, insurance=insurance, status='Opened', claim_form=claim_form)
+                user=user, title=title, insurance=insurance, status='Opened', claim_form=claim_form, description=description)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
@@ -87,6 +88,7 @@ class ClaimView(APIView):
                 title = data['title']
                 claim_form = data['claim_form']
                 insurance_id = data['insurance']
+                description = data['description']
                 if title:
                     claim.title = title
                 if insurance_id:
@@ -94,6 +96,8 @@ class ClaimView(APIView):
                     claim.insurance = insurance
                 if claim_form:
                     claim.claim_form = claim_form
+                if description:
+                    claim.description = description
                 claim.status = 'Opened'
                 claim.save()
                 return Response({"message": "Claim updated successfuly"}, status=status.HTTP_200_OK)
@@ -101,6 +105,7 @@ class ClaimView(APIView):
                 return Response({"message": "you can't update your claim without company request"}, status=status.HTTP_403_FORBIDDEN)
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
+
     def delete(self, request, id):
         user = request.user
         if user.type == 'Insured' or user.type == 'Holder':

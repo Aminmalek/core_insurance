@@ -36,7 +36,7 @@ class InsuranceView(APIView):
                 return Response({"message": "insurance already exist"}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 Insurance.objects.create(
-                    name=name, description=description, type=type, price=price, register_form=register_form, claim_form=claim_form)
+                    name=name, description=description, price=price, register_form=register_form, claim_form=claim_form)
             return Response({"message": "insurance created successfuly"}, status=status.HTTP_201_CREATED)
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)

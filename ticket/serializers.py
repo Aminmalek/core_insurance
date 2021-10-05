@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Claim, Ticket
-
+from payment.serializers import InsuranceConnectorSerializer
 
 class TicketSerializer(serializers.ModelSerializer):
 
@@ -10,7 +10,7 @@ class TicketSerializer(serializers.ModelSerializer):
                   'is_accepted_by_company', 'has_withdrawed']
 
 class ClaimSerializer(serializers.ModelSerializer):
-
+    insurance = InsuranceConnectorSerializer()
     class Meta:
         model = Claim
         fields = '__all__'

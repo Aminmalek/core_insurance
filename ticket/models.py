@@ -35,7 +35,8 @@ class Claim(models.Model):
     insurance = models.ForeignKey(
         InsuranceConnector, on_delete=models.DO_NOTHING)
     title = models.CharField(max_length=100)
-    status = models.CharField(max_length=10, choices=CLAIM_STATUS_CHOICES,null=True)
+    description = models.TextField()
+    status = models.CharField(max_length=10, choices=CLAIM_STATUS_CHOICES)
     response = models.TextField(max_length=500)
     claim_form = models.JSONField()
     is_archived = models.BooleanField(default=False)
