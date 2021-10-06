@@ -26,7 +26,7 @@ class TicketView(APIView):
             ticket_name = data['name']
             description = data['description']
             Ticket.objects.create(
-                user=user, name=ticket_name, description=description)
+                user=user, name=ticket_name, status='Opened', description=description)
             return Response({"message": "Ticket created successfuly"}, status=status.HTTP_200_OK)
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
