@@ -109,15 +109,12 @@ class UserView(APIView):
             type = data['type']
             user_for_update = User.objects.get(id=id)
             #user.is_active = True if is_active == "true" else False M.
-            
             if is_active:
                 if is_active == "true":
-                    user_for_update.is_active = True
-                    user_for_update.save()   
+                    user_for_update.is_active = True 
                 elif is_active == "false":
                     user_for_update.is_active = False
-                    user_for_update.save()
-               
+                          
             if type:
                 user_for_update.type = type
             user_for_update.save()

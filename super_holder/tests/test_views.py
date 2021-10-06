@@ -122,19 +122,19 @@ class SuperHolderTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
         user2 = User.objects.create(username='001245789', password='123456',type="Holder")
         user3 = User.objects.create(username='021654654', password='123456',type="Holder")
-        data = {"supported_holders": "10"}
-        response = self.client.put('/api/superholder', data)
+        data1 = {"supported_holders": "10"}
+        data2 = {"supported_holders": "11"}
+        response = self.client.put('/api/superholder/5', data1)
+        response = self.client.put('/api/superholder/5', data2)
+        super_holder = SuperHolder.objects.get(user=user)
+        supported = super_holder.supported_holders.all()
+        ids_list = []
+        ids_must_be = [10,11]
+        for user in supported:
+            id = user.id
+            ids_list.append(id)
+        
+        self.assertEqual(ids_list, ids_must_be)
         self.assertEqual(200, response.status_code)
-    '''
-    def test_none_company_user_can_delete_insureds(self):
-        company_user = User.objects.create(
-            username="company", password="123456", type="Vendor")
-        new_token = Token.objects.create(user=company_user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
-        user = User.objects.create(
-            username="mamad_gholi", password="123456", type="Insured")
-        Insured.objects.create(user=user)
-        data = {"user_id":user.id}
-        response = self.client.delete(self.url,data)
-        self.assertEqual({"message": "you are not authorized to perform this action"}, response.data)
-    '''
+        
+    def test_superholder_add_holder(self):

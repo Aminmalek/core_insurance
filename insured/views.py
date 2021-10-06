@@ -46,14 +46,11 @@ class InsuredView(APIView):
     def put(self, request, id):
         data = request.data
         user = request.user
-        if user.type == 'Company':
-            user = User.objects.get(id=id)
         supported_insureds = data['supported_insureds']
         insured = Insured.objects.get(user=user)
         if supported_insureds:
-            for insured_id in supported_insureds:
-                user = User.objects.get(id=insured_id)
-                insured.supported_insureds.add(user)
+            user = User.objects.get(id=supported_insureds)
+            insured.supported_insureds.add(user)
         insured.save()
         return Response({"message": "insured updated successfuly"})
 
