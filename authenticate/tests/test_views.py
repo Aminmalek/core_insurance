@@ -175,7 +175,7 @@ class TestUserView(APITestCase):
         User.objects.filter(username=6874654654).update(id=123)
         
         data = {
-            "is_active": "true",
+            "is_active": True,
             "type": "Insured"
         }
         response = self.client.put("/api/auth/user/123", data)

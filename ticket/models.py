@@ -22,7 +22,7 @@ class Ticket(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.PROTECT, null=True, blank=True)
     name = models.CharField(max_length=150)
-    description = models.TextField(max_length=500)
+    description = models.TextField(max_length=250,null=True,)
     status = models.CharField(max_length=10, choices=TICKET_STATUS_CHOICES,null=True)
 
     def __str__(self):
@@ -35,9 +35,9 @@ class Claim(models.Model):
     insurance = models.ForeignKey(
         InsuranceConnector, on_delete=models.DO_NOTHING)
     title = models.CharField(max_length=100)
-    description = models.TextField()
+    description = models.TextField(max_length=250,null=True,)
     status = models.CharField(max_length=10, choices=CLAIM_STATUS_CHOICES)
-    response = models.TextField(max_length=500)
+    response = models.TextField(max_length=250)
     claim_form = models.JSONField()
     is_archived = models.BooleanField(default=False)
 

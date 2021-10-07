@@ -1,4 +1,4 @@
-from rest_framework import serializers
+'''from rest_framework import serializers
 from ticket.models import Ticket
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
@@ -24,3 +24,4 @@ class TestSerliazers(APITestCase):
         self.serializer = TicketForCompanySerializer(self.ticket)
 
         self.assertEqual(ser_data,self.serializer.data)
+'''

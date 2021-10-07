@@ -29,7 +29,7 @@ class TicketsTests(APITestCase):
             "description": "some thing!",
         }
         response = self.client.post(self.url, data)
-        self.assertEqual(201, response.status_code)
+        self.assertEqual(200, response.status_code)
 
     def test_insured_can_add_tickets(self):
         insured_user = User.objects.create(
@@ -44,7 +44,7 @@ class TicketsTests(APITestCase):
             "description": "some thing!",
         }
         response = self.client.post(self.url, data)
-        self.assertEqual(201, response.status_code)
+        self.assertEqual(200, response.status_code)
 
     def test_user_holder_can_view_his_tickets(self):
         response = self.client.get(self.url)
@@ -64,7 +64,7 @@ class TicketsTests(APITestCase):
             HTTP_AUTHORIZATION='Token ' + self.new_token.key)
 
         response = self.client.get(self.url)
-        self.assertEqual(401, response.status_code)
+        self.assertEqual(403, response.status_code)
 
     def test_ticket_serializers(self):
         insured_user = User.objects.create(

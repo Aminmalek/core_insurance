@@ -43,7 +43,7 @@ class LoginView(APIView):
         username = data['username']
         password = data['password']
         user = auth.authenticate(username=username, password=password)
-        #this makes tests pass
+        # this makes tests pass
         #user = User.objects.get(username=username,password=password)
         if user:
             token, created = Token.objects.get_or_create(user=user)
@@ -103,7 +103,7 @@ class UserView(APIView):
     def put(self, request, id):
         data = request.data
         user = request.user
-        
+
         if user.type == "Company":
             is_active = data['is_active']
             type = data['type']
