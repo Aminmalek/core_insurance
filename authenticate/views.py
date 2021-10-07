@@ -107,7 +107,7 @@ class UserView(APIView):
             is_active = data['is_active']
             type = data['type']
             user = User.objects.get(id=id)
-            if is_active:
+            if is_active is not None:
                 user.is_active = is_active
             if type:
                 user.type = type
