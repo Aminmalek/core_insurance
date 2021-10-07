@@ -92,8 +92,12 @@ WSGI_APPLICATION = 'Health_Insurance.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'dce4fg9oqeb3sh',
+        'USER': 'hvieuepruquicu',
+        'PASSWORD': '0e3bd7ef06fdc75876dd50db67fb7b23dcc97004d85d836860e6a64770bb236f',
+        'HOST': 'ec2-54-155-226-153.eu-west-1.compute.amazonaws.com',
+        'PORT': '5432',
     }
 }
 
