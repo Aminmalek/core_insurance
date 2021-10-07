@@ -103,6 +103,7 @@ class UserView(APIView):
     def put(self, request, id):
         data = request.data
         user = request.user
+        
         if user.type == "Company":
             is_active = data['is_active']
             type = data['type']
@@ -112,6 +113,6 @@ class UserView(APIView):
             if type:
                 user.type = type
             user.save()
-            return Response({"message": "user updated successfully"})
+            return Response({"message": "user updated successfully","user active":user_for_update.is_active,"user type":user_for_update.type})
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
