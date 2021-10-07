@@ -42,13 +42,25 @@ class InsuredTests(APITestCase):
         new_token = Token.objects.create(user=none_company_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
         response = self.client.get(self.url)
-        self.assertEqual(401, response.status_code)
+        self.assertEqual(403, response.status_code)
 
     def test_holder_can_post_user(self):
+        holder = User.objects.create(
+            username="company", password="123456", type="Holder")
+        new_token = Token.objects.create(user=holder)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
         user = User.objects.create(
             username="mamad_gholi", password="123456", type="Insured")
-        data = {"user_id":user.id}
-        response = self.client.post(self.url,data)
+        Insured.objects.create(user=holder)
+        data = {
+                "username": 6546876584,
+                "password": "25448576857",
+                "first_name": "amin",
+                "last_name": "malek",
+                "phone": "9124578945",
+                "bank_account_number":87687646587687687685
+                }
+        response = self.client.post(self.url, data)
         self.assertEqual(201, response.status_code)
 
     def test_company_user_can_delete_insureds(self):
@@ -59,8 +71,7 @@ class InsuredTests(APITestCase):
         user = User.objects.create(
             username="mamad_gholi", password="123456", type="Insured")
         Insured.objects.create(user=user)
-        data = {"user_id":user.id}
-        response = self.client.delete(self.url,data)
+        response = self.client.delete('/api/insured/'+str(user.id))
         self.assertEqual(200, response.status_code)
 
     def test_none_company_user_can_delete_insureds(self):
@@ -71,6 +82,6 @@ class InsuredTests(APITestCase):
         user = User.objects.create(
             username="mamad_gholi", password="123456", type="Insured")
         Insured.objects.create(user=user)
-        data = {"user_id":user.id}
-        response = self.client.delete(self.url,data)
-        self.assertEqual({"message": "you are not authorized to perform this action"}, response.data)
+        response = self.client.delete('/api/insured/'+str(user.id))
+        self.assertEqual(
+            {"message": "you are not authorized to perform this action"}, response.data)

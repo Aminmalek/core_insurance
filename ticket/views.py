@@ -15,7 +15,8 @@ class TicketView(APIView):
             tickets = Ticket.objects.filter(user=user)
         elif user.type == 'Company':
             tickets = Ticket.objects.all()
-
+        else:
+             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
         serializer = TicketSerializer(tickets, many=True)
         return Response(serializer.data)
 

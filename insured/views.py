@@ -26,23 +26,35 @@ class InsuredView(APIView):
         data = request.data
         user = request.user
         if user.type == "Holder":
+
             username = data['username']
             password = data['password']
             first_name = data['first_name']
             last_name = data['last_name']
             phone = data['phone']
             bank_account_number = data['bank_account_number']
+
             if User.objects.filter(username=username).exists() or User.objects.filter(phone=phone).exists():
                 return Response({'error': 'Username or Phone number already exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            user = User.objects.create_user(username=username, password=password, first_name=first_name,
-                                            last_name=last_name, is_active=True, phone=phone, bank_account_number=bank_account_number, type='Insured')
+            user = User.objects.create_user(username=username,
+                                            password=password,
+                                            first_name=first_name,
+                                            last_name=last_name,
+                                            is_active=True,
+                                            phone=phone,
+                                            bank_account_number=bank_account_number,
+                                            type='Insured')
             user.save()
             Insured.objects.create(user=user)
+            #return Response({"message": "insured created successfuly"}, status=status.HTTP_201_CREATED)
+            # Commenting this part makes tests pass
+            
             if request.user.type == "Holder":
-                Insured.objects.get(
-                    user=request.user).supported_insureds.add(user)
+                
+                insured = Insured.objects.get(user=request.user)
+                insured.supported_insureds.add(user)
             return Response({"message": "insured created successfuly"}, status=status.HTTP_201_CREATED)
-
+            
     def put(self, request, id):
         data = request.data
         user = request.user
