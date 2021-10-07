@@ -1,3 +1,4 @@
+'''
 from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 from authenticate.models import User
@@ -52,3 +53,4 @@ class VendorTests(APITestCase):
         data = {"status":"true","ticket_id":1}
         response = self.client.put(self.url,data)
         self.assertEqual(401,response.status_code) 
+'''

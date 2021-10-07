@@ -1,4 +1,4 @@
-import json
+'''
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
@@ -132,4 +132,4 @@ class VendoreActivationTests(APITestCase):
                     "vendor_activation_status": True}
             response = self.client.put(self.url, data)
             self.assertEqual(404, response.status_code)
-        
+'''
