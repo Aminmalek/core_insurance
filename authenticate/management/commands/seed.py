@@ -45,9 +45,9 @@ class Command(BaseCommand):
 
     def create_insurances(self):
         Insurance.objects.create(
-            name="بیمه خسارات درمانی", type="درمانی", description="پرداخت هزینه های درمانی شامل هزینه های دارویی و بیمارستانی", price=10000000, register_form={}, claim_form={})
+            name="بیمه خسارات درمانی", description="پرداخت هزینه های درمانی شامل هزینه های دارویی و بیمارستانی", price=10000000, register_form={}, claim_form={})
         Insurance.objects.create(
-            name="بیمه شخص ثالث", type="درمانی", description="پرداخت هزینه های مربوط به تصادفات و خسارات ناشی از سوانح", price=10000000, register_form={}, claim_form={})
+            name="بیمه شخص ثالث", description="پرداخت هزینه های مربوط به تصادفات و خسارات ناشی از سوانح", price=10000000, register_form={}, claim_form={})
         self.stdout.write("insurances created")
 
     def handle(self, *args, **kwargs):

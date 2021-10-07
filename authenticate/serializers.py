@@ -16,3 +16,9 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'first_name', 'last_name',
                   'username', 'user_permissions', 'type', 'is_active', 'phone', 'bank_account_number')
+
+
+class UserMinifiedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name', 'type')

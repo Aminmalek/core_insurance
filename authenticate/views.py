@@ -106,19 +106,13 @@ class UserView(APIView):
 
         if user.type == "Company":
             is_active = data['is_active']
-            types = data['type']
-            user_for_update = User.objects.get(id=id)
-            # user.is_active = True if is_active == "true" else False M.
-            if is_active:
-                if is_active == True:
-                    user_for_update.is_active = True
-                else:
-                    user_for_update.is_active = False
-                    return Response({"message": "user deactivated successfully","active":user_for_update.is_active})
-            user_for_update.save()
-            if types:
-                user_for_update.type = types
-            user_for_update.save()
+            type = data['type']
+            user = User.objects.get(id=id)
+            if is_active is not None:
+                user.is_active = is_active
+            if type:
+                user.type = type
+            user.save()
             return Response({"message": "user updated successfully"})
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
