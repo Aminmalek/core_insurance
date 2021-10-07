@@ -2,6 +2,7 @@ from insurance.models import Insurance
 from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 from authenticate.models import User
+from insured.models import Insured
 from super_holder.models import SuperHolder
 from django.urls import reverse
 
@@ -124,8 +125,8 @@ class SuperHolderTests(APITestCase):
         user3 = User.objects.create(username='021654654', password='123456',type="Holder")
         data1 = {"supported_holders": "10"}
         data2 = {"supported_holders": "11"}
-        response = self.client.put('/api/superholder/5', data1)
-        response = self.client.put('/api/superholder/5', data2)
+        response = self.client.put('/api/superholder', data1)
+        response = self.client.put('/api/superholder', data2)
         super_holder = SuperHolder.objects.get(user=user)
         supported = super_holder.supported_holders.all()
         ids_list = []
@@ -137,4 +138,16 @@ class SuperHolderTests(APITestCase):
         self.assertEqual(ids_list, ids_must_be)
         self.assertEqual(200, response.status_code)
         
-    def test_superholder_add_holder(self):
+    def test_superholder_can_delete_holder(self):
+        holder1 = User.objects.create(username='001245789', password='123456',type="Holder")
+        holder2 = User.objects.create(username='021654654', password='123456',type="Holder")
+        Insured.objects.create(user=holder1)
+        Insured.objects.create(user=holder2)
+        super_holder = SuperHolder.objects.create(user=self.user)
+        user1 = User.objects.get(id=13)
+        user2 = User.objects.get(id=14)
+        super_holder.supported_holders.add(user1)
+        super_holder.supported_holders.add(user2)
+
+        response = self.client.delete('/api/superholder/13')
+        self.assertEqual({"message": "Holder deleted successfuly"},response.data)

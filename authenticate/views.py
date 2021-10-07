@@ -43,7 +43,7 @@ class LoginView(APIView):
         username = data['username']
         password = data['password']
         user = auth.authenticate(username=username, password=password)
-        #this makes tests pass
+        # this makes tests pass
         #user = User.objects.get(username=username,password=password)
         if user:
             token, created = Token.objects.get_or_create(user=user)
@@ -103,21 +103,22 @@ class UserView(APIView):
     def put(self, request, id):
         data = request.data
         user = request.user
-        
+
         if user.type == "Company":
             is_active = data['is_active']
-            type = data['type']
+            types = data['type']
             user_for_update = User.objects.get(id=id)
-            #user.is_active = True if is_active == "true" else False M.
+            # user.is_active = True if is_active == "true" else False M.
             if is_active:
-                if is_active == "true":
-                    user_for_update.is_active = True 
-                elif is_active == "false":
+                if is_active == True:
+                    user_for_update.is_active = True
+                else:
                     user_for_update.is_active = False
-                          
-            if type:
-                user_for_update.type = type
+                    return Response({"message": "user deactivated successfully","active":user_for_update.is_active})
             user_for_update.save()
-            return Response({"message": "user updated successfully","user active":user_for_update.is_active,"user type":user_for_update.type})
+            if types:
+                user_for_update.type = types
+            user_for_update.save()
+            return Response({"message": "user updated successfully"})
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)

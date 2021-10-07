@@ -47,7 +47,7 @@ class SuperHolderView(APIView):
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
     def put(self, request):
-        # This method must change in better way A.
+        
         data = request.data
         user = request.user
         supported_holders = data['supported_holders']
