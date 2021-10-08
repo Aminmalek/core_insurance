@@ -46,10 +46,14 @@ class TicketView(APIView):
 
 
 class ClaimView(APIView):
-    def get(self, request):
+    def get(self, request, id=None):
         user = request.user
-        if user.type == 'Holder' or user.type == 'Insured':
-            claims = Claim.objects.filter(user=user)
+
+        if user.type == 'Holder' or user.type == 'Insured' or user.type == 'SuperHolder':
+            if id:
+                claims = Claim.objects.filter(id=id, user=user)
+            else:
+                claims = Claim.objects.filter(user=user)
         elif user.type == 'Company':
             claims = Claim.objects.all()
 
