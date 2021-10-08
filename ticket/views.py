@@ -48,14 +48,17 @@ class TicketView(APIView):
 class ClaimView(APIView):
     def get(self, request, id=None):
         user = request.user
-
+        print(id)
         if user.type == 'Holder' or user.type == 'Insured' or user.type == 'SuperHolder':
             if id:
                 claims = Claim.objects.filter(id=id, user=user)
             else:
                 claims = Claim.objects.filter(user=user)
         elif user.type == 'Company':
-            claims = Claim.objects.all()
+            if id:
+                claims = Claim.objects.filter(id=id)
+            else:
+                claims = Claim.objects.all()
 
         serializer = ClaimSerializer(claims, many=True)
         return Response(serializer.data)
