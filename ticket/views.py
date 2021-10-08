@@ -52,16 +52,19 @@ class ClaimView(APIView):
         print(id)
         if user.type == 'Holder' or user.type == 'Insured' or user.type == 'SuperHolder':
             if id:
-                claims = Claim.objects.filter(id=id, user=user)
+                claims = Claim.objects.get(id=id, user=user)
+                serializer = ClaimSerializer(claims)
             else:
                 claims = Claim.objects.filter(user=user)
+                serializer = ClaimSerializer(claims, many=True)
+
         elif user.type == 'Company':
             if id:
-                claims = Claim.objects.filter(id=id)
+                claims = Claim.objects.get(id=id)
+                serializer = ClaimSerializer(claims)
             else:
                 claims = Claim.objects.all()
-
-        serializer = ClaimSerializer(claims, many=True)
+                serializer = ClaimSerializer(claims, many=True)
         return Response(serializer.data)
 
     def post(self, request):
