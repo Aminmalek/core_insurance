@@ -8,7 +8,6 @@ from ticket.serializers import TicketSerializer
 from insurance.models import Insurance
 
 
-'''
 class TicketsTests(APITestCase):
 
     def setUp(self):
@@ -83,7 +82,6 @@ class TicketsTests(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(serializer.data, response.data)
 
-'''
 '''
     def test_none_vendor_can_update_ticket(self):
         fake_user = User.objects.create(
@@ -239,3 +237,17 @@ class ClaimTests(APITestCase):
         
         response = self.client.put("/api/claim/564",format='json',data=data_put)
         self.assertEqual({"message": "you can't update your claim without company request"}, response.data)
+
+    def test_Insured_can_archive_claim(self):
+        InsuranceConnector.objects.create(id=2,user=self.user,)
+        con = InsuranceConnector.objects.get(id=2)
+        Claim.objects.create(user=self.user,id=4545,title="some insurance!",
+        insurance=con,
+        description="this is an claim",
+        claim_form={"where": "Tehran",
+                    "wich city": "Tehran",
+                    "how much": 8456,
+                    "when": "1400/02/05"},
+        status="Rejected")
+        response = self.client.delete("/api/claim/4545")
+        self.assertEqual({"message": "Claim archived successfuly"}, response.data)
