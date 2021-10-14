@@ -210,3 +210,32 @@ class ClaimTests(APITestCase):
         
         response = self.client.put("/api/claim/745",format='json',data=data_put)
         self.assertEqual({"message": "Claim updated successfuly"}, response.data)
+
+    def test_Holder_cant_change_claim_status(self):
+        _user = User.objects.create(
+        username="35685754", password="123456", type="Holder")
+        self.new_token = Token.objects.create(user=_user)
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Token ' + self.new_token.key)
+        InsuranceConnector.objects.create(id=2,user=self.user,)
+        con = InsuranceConnector.objects.get(id=2)
+        Claim.objects.create(id=564,title="some insurance!",
+        insurance=con,
+        description="this is an claim",
+        claim_form={"where": "Tehran",
+                                "wich city": "Tehran",
+                                "how much": 8456,
+                                "when": "1400/02/05"},
+        status="Rejected")
+        data_put = {
+                "title":"this must be paid!!",
+                "description": "سلام این یه توضیحهههه",     
+        "claim_form":{"where": "Tehran",
+                                "wich city": "Tehran",
+                                "how much": 8456,
+                                "when": "1400/02/05"},
+        "insurance":2
+        }
+        
+        response = self.client.put("/api/claim/564",format='json',data=data_put)
+        self.assertEqual({"message": "you can't update your claim without company request"}, response.data)
