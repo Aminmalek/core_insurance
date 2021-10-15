@@ -3,12 +3,21 @@ from rest_framework.views import APIView
 from rest_framework import status
 from .models import Insurance
 from .serializers import InsuranceSerializer
+import json
+import uuid
 
 
 class InsuranceView(APIView):
     """
         This api is used to handle full crud operations on insurance
     """
+
+    def guid_generator(self, object):
+        obj = json.loads(object)
+        for i in obj:
+            if 'id' not in i:
+                i['id'] = str(uuid.uuid4())
+        return obj
 
     def get(self, request, id=None):
         if id:
@@ -30,8 +39,9 @@ class InsuranceView(APIView):
             name = data['name']
             description = data['description']
             price = data['price']
-            register_form = data['register_form']
-            claim_form = data['claim_form']
+            register_form = self.guid_generator(data['register_form'])
+            claim_form = self.guid_generator(data['claim_form'])
+
             if Insurance.objects.filter(name=name).exists():
                 return Response({"message": "insurance already exist"}, status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -49,12 +59,12 @@ class InsuranceView(APIView):
             name = data['name']
             description = data['description']
             price = data['price']
-            register_form = data['register_form']
-            claim_form = data['claim_form']
+            register_form = self.guid_generator(data['register_form'])
+            claim_form = self.guid_generator(data['claim_form'])
             insurance = Insurance.objects.filter(id=id)
             if insurance:
                 insurance.update(
-                    name=name, description=description,price=price, register_form=register_form, claim_form=claim_form)
+                    name=name, description=description, price=price, register_form=register_form, claim_form=claim_form)
                 return Response({"message": "insurance updated successfuly"}, status=status.HTTP_202_ACCEPTED)
             else:
                 return Response({"message": "insurance doesn't exist"}, status=status.HTTP_400_BAD_REQUEST)
