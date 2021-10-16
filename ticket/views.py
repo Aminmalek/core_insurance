@@ -11,7 +11,7 @@ from . serializers import TicketSerializer, ClaimSerializer
 class TicketView(APIView):
     def get(self, request):
         user = request.user
-        if user.type == 'Holder' or user.type == 'Insured':
+        if user.type == 'Insured' or user.type == 'Holder'  or user.type == 'SuperHolder'  or user.type == 'Vendor':
             tickets = Ticket.objects.filter(user=user)
         elif user.type == 'Company':
             tickets = Ticket.objects.all()
@@ -23,7 +23,7 @@ class TicketView(APIView):
     def post(self, request):
         data = request.data
         user = request.user
-        if user.type == 'Insured' or user.type == 'Holder':
+        if user.type == 'Insured' or user.type == 'Holder'  or user.type == 'SuperHolder'  or user.type == 'Vendor':
             ticket_name = data['name']
             description = data['description']
             Ticket.objects.create(
@@ -36,10 +36,13 @@ class TicketView(APIView):
         data = request.data
         user = request.user
         if user.type == 'Company':
-            is_accepted_by_company = data['is_accepted_by_company']
             ticket = Ticket.objects.get(id=id)
-            if is_accepted_by_company:
-                ticket.is_accepted_by_company = True if is_accepted_by_company == 'true' else False
+            ticket_status = data['status']
+            description = data['description']
+            if ticket_status:
+                ticket.status = ticket_status
+            if description:
+                ticket.description = description
             ticket.save()
             return Response({"message": "Ticket updated successfuly"}, status=status.HTTP_200_OK)
         else:
