@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from .serializers import UserSerializer
 from .models import User
-
+from Core.decorators import *
 
 class SignupView(APIView):
     """
@@ -90,29 +90,22 @@ class UserView(APIView):
     """
         For getting user list and updating users
     """
-
+    @is_company
     def get(self, request):
-        user = request.user
-        if user.type == "Company":
-            users = User.objects.all()
-            users = UserSerializer(users, many=True)
-            return Response(users.data)
-        else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
-
+        users = User.objects.all()
+        users = UserSerializer(users, many=True)
+        return Response(users.data)
+        
+    @is_company
     def put(self, request, id):
         data = request.data
-        user = request.user
-
-        if user.type == "Company":
-            is_active = data['is_active']
-            type = data['type']
-            user = User.objects.get(id=id)
-            if is_active is not None:
-                user.is_active = is_active
-            if type:
-                user.type = type
-            user.save()
-            return Response({"message": "user updated successfully"})
-        else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
+        is_active = data['is_active']
+        type = data['type']
+        user = User.objects.get(id=id)
+        if is_active is not None:
+            user.is_active = is_active
+        if type:
+            user.type = type
+        user.save()
+        return Response({"message": "user updated successfully"})
+     

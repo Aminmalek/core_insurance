@@ -5,7 +5,7 @@ from rest_framework import status
 from insured.models import Insured
 from . serializers import InsuredSerializer
 from authenticate.models import User
-
+from Core.decorators import *
 
 class InsuredView(APIView):
 
