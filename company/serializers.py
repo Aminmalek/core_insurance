@@ -10,5 +10,4 @@ class TicketForCompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ticket
-        fields = ['name', 'username', 'description', 'is_accepted_by_vendor',
-                  'is_accepted_by_company', 'has_withdrawed']
+        fields = ['name', 'username', 'description', 'has_withdrawed']

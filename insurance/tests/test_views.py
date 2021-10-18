@@ -3,7 +3,9 @@ from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 from authenticate.models import User
 from django.urls import reverse
+from django.test.client import encode_multipart, RequestFactory
 
+factory = RequestFactory()
 
 class InsuranceTests(APITestCase):
 
@@ -40,12 +42,15 @@ class InsuranceTests(APITestCase):
                 "claim_form": {"where": "Tehran",
                                "wich city": "Tehran",
                                "how much": 8456,
-                               "when": "1400/02/05"}
-                }
-        response = self.client.post(self.url, format='json', data=data)
-        self.assertEqual(
-            {"message": "insurance created successfuly"}, response.data)
+                               "when": "1400/02/05"}}
 
+        content = encode_multipart('BoUnDaRyStRiNg', data)
+        content_type = 'multipart/form-data; boundary=BoUnDaRyStRiNg'
+        response = factory.post('/api/insurance' ,content, content_type=content_type)
+        self.assertEqual(
+            {"message": "insurance created successfuly"}, response)
+
+'''
     def test_user_none_copmany_can_post_insurances(self):
 
         none_company_user = User.objects.create(
@@ -66,7 +71,7 @@ class InsuranceTests(APITestCase):
                                "how much": 8456,
                                "when": "1400/02/05"}
                 }
-        response = self.client.post(self.url,  format='json', data=data)
+        response = self.client.post(self.url,  content_type="multipart/form-data", data=data)
         self.assertEqual(403, response.status_code)
 
     def test_user_copmany_can_post_duplicate_insurances(self):
@@ -157,3 +162,4 @@ class InsuranceTests(APITestCase):
 
         response = self.client.delete('/api/insurance/1')
         self.assertEqual(403, response.status_code)
+'''
