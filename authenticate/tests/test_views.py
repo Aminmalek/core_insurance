@@ -9,10 +9,7 @@ from django.urls import reverse
 
 class TestSignup(APITestCase):
 
-    def setUp(self):
-        self.url = reverse("register")
-
-    def test_user_can_register(self):
+    def test_1_user_can_register(self):
 
         data = {
 
@@ -22,22 +19,22 @@ class TestSignup(APITestCase):
             "last_name": "Gholami",
             "phone": "3543543543"
         }
-        response = self.client.post(self.url, data)
+        response = self.client.post('/api/auth/register', data)
         self.assertEqual(201, response.status_code)
 
-    def test_user_can_register_with_repetitive_username(self):
+    def test_2_user_can_register_with_repetitive_username(self):
 
-        User.objects.create(username="354354354",
+        User.objects.create(username="12345674",
                             password=752783782, phone=9124756598)
         data = {
 
-            "username": "354354354",
+            "username": "12345674",
             "password": "123456",
             "first_name": "Gholam",
             "last_name": "Gholami",
             "phone": "3543543543"
         }
-        response = self.client.post(self.url, data)
+        response = self.client.post('/api/auth/register', data)
         self.assertEqual(406, response.status_code)
 
 
