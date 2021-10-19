@@ -15,7 +15,8 @@ class FileView(APIView):
             for chunk in file.chunks():
                 destination.write(chunk)
         return id
-    def post(self,request):
+
+    def put(self,request):
 
         file_obj = request.FILES['file']
         id = self.save_uploaded_file(file_obj,file_obj.name)
