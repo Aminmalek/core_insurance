@@ -14,6 +14,7 @@ class FileView(APIView):
        
             for chunk in file.chunks():
                 destination.write(chunk)
+            destination.close()
         return id
 
     def put(self,request):
