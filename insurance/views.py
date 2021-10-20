@@ -33,7 +33,7 @@ class InsuranceView(APIView):
             serializer = InsuranceSerializer(insurance, many=True)
             return Response(serializer.data)
 
-    @is_company
+    #@is_company
     def post(self, request):
         data = request.data
         user = request.user
