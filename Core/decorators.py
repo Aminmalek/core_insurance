@@ -62,6 +62,15 @@ def is_super_holder(view):
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
     return wrapper_func
 
+def is_holder_superholder_insured(view):
+    def wrapper_func(self, request, *args, **Kwargs):
+        if request.user.type == "Insured" or  request.user.type == "Holder" or request.user.type == "SuperHolder":
+            # change your logic here
+            return view(self, request, *args, **Kwargs)
+        else:
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
+    return wrapper_func
+
 def role_needed(*permissions):
     def decorator(f):
         @wraps(f)

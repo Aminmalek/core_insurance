@@ -1,5 +1,7 @@
 from django.db import models
 
+# price field most change
+
 
 class Insurance(models.Model):
     name = models.CharField(max_length=20, unique=True)

@@ -13,7 +13,7 @@ class User(AbstractUser):
     type = models.CharField(max_length=11, choices=TYPE_CHOICES)
     phone = models.BigIntegerField(null=True)
     bank_account_number = models.CharField(max_length=26)
-
+    cash = models.IntegerField(default=0)
     REQUIRED_FIELDS = ['phone', 'bank_account_number']
 
     def __str__(self):

@@ -108,4 +108,24 @@ class UserView(APIView):
             user.type = type
         user.save()
         return Response({"message": "user updated successfully"})
-     
+
+
+class FinancialManagementView(APIView):
+    """
+        adding money to users wallet and can see it by that user
+    """
+    @is_holder_superholder_insured
+    def get(self,request):
+        user = request.user
+        user = User.objects.get(username=user.username)
+        return Response(user.cash)
+
+    @is_holder_superholder_insured    
+    def put(self,request):
+        user = request.user
+        data = request.data
+        cash = data['cash']
+        user = User.objects.get(username=user.username)
+        user.cash = int(cash) + int(user.cash)
+        user.save()
+        return Response({"message":"Money added to your account successfully"})
