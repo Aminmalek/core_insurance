@@ -5,18 +5,17 @@ from django.contrib.auth.admin import UserAdmin
 
 class CustomUserAdmin(UserAdmin):
     model = User
-    filter_horizontal = ('user_permissions', 'groups', )
-    list_display = ('username', 'first_name','last_name' ,'id',
-                     'is_staff', 'last_login')
+    filter_horizontal = []
+    list_display = ('username', 'first_name', 'last_name', 'id','last_login')
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         (('Personal info'), {
-         'fields': ('first_name', 'last_name', 'email', 'cash', 'type', 'phone', 'bank_account_number')}),
+         'fields': ('first_name', 'last_name', 'cash', 'type', 'phone', 'bank_account_number')}),
         (('Permissions'), {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+            'fields': ('is_active', 'is_superuser',),
         }),
-        (('Important dates'), {'fields': ('last_login', 'date_joined')}),
+        (('Important dates'), {'fields': ('last_login',)}),
     )
-
-
+    list_filter = ('is_superuser', 'is_active',)
+    
 admin.site.register(User, CustomUserAdmin)
