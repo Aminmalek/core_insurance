@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from Core.decorators import is_company, is_holder_insured
 
+
 class InsuranceConnectorView(APIView):
     def get(self, request):
         user = request.user

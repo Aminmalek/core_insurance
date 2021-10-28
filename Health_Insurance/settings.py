@@ -52,8 +52,6 @@ LOCAL_APPS = [
     'super_holder',
     'payment',
     'ticket',
-    'vendor',
-    'company',
 ]
 INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + LOCAL_APPS
 MIDDLEWARE = [
@@ -95,10 +93,10 @@ WSGI_APPLICATION = 'Health_Insurance.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'dce4fg9oqeb3sh',
-        'USER': 'hvieuepruquicu',
-        'PASSWORD': '0e3bd7ef06fdc75876dd50db67fb7b23dcc97004d85d836860e6a64770bb236f',
-        'HOST': 'ec2-54-155-226-153.eu-west-1.compute.amazonaws.com',
+        'NAME': 'bime',
+        'USER': 'amin',
+        'PASSWORD': '123456',
+        'HOST': '127.0.0.1',
         'PORT': '5432',
     }
 }
