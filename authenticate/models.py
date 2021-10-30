@@ -65,7 +65,6 @@ class User(AbstractBaseUser):
             return True
 
        
-
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['phone', 'bank_account_number']
-    # For Using in django admin panel 
+   

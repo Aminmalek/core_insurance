@@ -6,7 +6,7 @@ from django.contrib.auth.admin import UserAdmin
 class CustomUserAdmin(UserAdmin):
     model = User
     filter_horizontal = []
-    list_display = ('username', 'first_name', 'last_name', 'id','last_login')
+    list_display = ('username', 'first_name', 'last_name', 'type','id','last_login')
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         (('Personal info'), {
