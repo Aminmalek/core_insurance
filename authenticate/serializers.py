@@ -10,12 +10,10 @@ class PermissionSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    user_permissions = PermissionSerializer(many=True)
-
     class Meta:
         model = User
         fields = ('id', 'first_name', 'last_name',
-                  'username', 'user_permissions', 'type', 'is_active', 'phone', 'bank_account_number')
+                  'username', 'cash', 'type', 'is_active', 'phone', 'bank_account_number')
 
 
 class UserMinifiedSerializer(serializers.ModelSerializer):

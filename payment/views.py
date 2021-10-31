@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from Core.decorators import is_company, is_holder_insured
 
+
 class InsuranceConnectorView(APIView):
     def get(self, request):
         user = request.user
@@ -36,19 +37,19 @@ class InsuranceConnectorView(APIView):
     @is_holder_insured
     def post(self, request):
         data = request.data
-        user=request.user
+        user = request.user
         insurance_id = data['insurance_id']
         register_form = data['register_form']
         insurance = Insurance.objects.get(id=insurance_id)
         user = User.objects.get(id=user.id)
-        if int(user.cash) >= int(insurance.price) :
+        if int(user.cash) >= int(insurance.price):
             user.cash = int(user.cash) - int(insurance.price)
             InsuranceConnector.objects.create(
-            user=user, insurance=insurance, register_form=register_form, is_paid=True)
+                user=user, insurance=insurance, register_form=register_form, is_paid=True)
             user.type = "Holder"
             user.save()
         else:
-            return Response({"error":"you have not enough money to buy insurance"},status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "you have not enough money to buy insurance"}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message": "insurance purchased successfuly"}, status=status.HTTP_201_CREATED)
 
     @is_company
@@ -59,7 +60,6 @@ class InsuranceConnectorView(APIView):
         if is_accepted_by_company is not None:
             insurance_connector.is_accepted_by_company = True if is_accepted_by_company == "true" else False
         else:
-            return Response({"error":"please enter correct data"},status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "please enter correct data"}, status=status.HTTP_400_BAD_REQUEST)
         insurance_connector.save()
         return Response({"message": "insurance connector updated successfuly"})
-    

@@ -10,8 +10,6 @@ urlpatterns = [
     path('api/', include('insurance.urls')),
     path('api/', include('ticket.urls')),
     path('api/', include('payment.urls')),
-    path('api/', include('vendor.urls')),
-    path('api/', include('company.urls')),
     path('api/', include('super_holder.urls')),
     path('api/', include('Core.urls')),
 ]

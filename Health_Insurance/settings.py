@@ -52,8 +52,6 @@ LOCAL_APPS = [
     'super_holder',
     'payment',
     'ticket',
-    'vendor',
-    'company',
 ]
 INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + LOCAL_APPS
 MIDDLEWARE = [
