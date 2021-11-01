@@ -5,16 +5,17 @@ from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from Health_Insurance.settings import BASE_DIR
 from django.http import HttpResponse
+from rest_framework import permissions
 
 from authenticate.models import User
-
 from . decorators import is_company
 from . models import Message
 from . serializers import MessageSerializer
 
 class FileView(APIView):
     parser_class = (FileUploadParser,)
-    
+    permission_classes = (permissions.AllowAny,)
+
     def save_uploaded_file(self,file,file_name):
         
         import uuid
