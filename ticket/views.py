@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from payment.models import InsuranceConnector
 from . models import Ticket, Claim
 from . serializers import TicketSerializer, ClaimSerializer
-
+from Core.decorators import *
 
 class TicketView(APIView):
     def get(self, request):
@@ -120,15 +120,14 @@ class ClaimView(APIView):
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
+    @is_holder_insured
     def delete(self, request, id):
         user = request.user
-        if user.type == 'Insured' or user.type == 'Holder':
-            claim = Claim.objects.get(id=id)
-            if claim.user == user:
-                claim.is_archived = True
-                claim.save()
-                return Response({"message": "Claim archived successfuly"}, status=status.HTTP_200_OK)
-            else:
-                return Response({"message": "you can only delete your claims"}, status=status.HTTP_403_FORBIDDEN)
+        claim = Claim.objects.get(id=id)
+        if claim.user == user:
+            claim.is_archived = True
+            claim.save()
+            return Response({"message": "Claim archived successfuly"}, status=status.HTTP_200_OK)
         else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"message": "you can only delete your claims"}, status=status.HTTP_403_FORBIDDEN)
+    
