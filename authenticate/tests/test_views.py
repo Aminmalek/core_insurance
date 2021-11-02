@@ -17,9 +17,11 @@ class TestSignup(APITestCase):
             "password": "123456",
             "first_name": "Gholam",
             "last_name": "Gholami",
-            "phone": "3543543543"
+            "phone": "3543543543",
+            "bank_account_number":63574657463546574635
         }
         response = self.client.post('/api/auth/register', data)
+        User.objects.get(username="354354354")
         self.assertEqual(201, response.status_code)
 
     def test_2_user_can_register_with_repetitive_username(self):
@@ -32,7 +34,8 @@ class TestSignup(APITestCase):
             "password": "123456",
             "first_name": "Gholam",
             "last_name": "Gholami",
-            "phone": "3543543543"
+            "phone": "3543543543",
+            "bank_account_number":63574657463546574635
         }
         response = self.client.post('/api/auth/register', data)
         self.assertEqual(406, response.status_code)
@@ -46,25 +49,23 @@ class TestLoginView(APITestCase):
         self.password = "123456"
         self.type = "Company"
         self.phone = "3546345"
-    # this test is not pass
-    '''
+    
     def test_can_user_login(self):
-        user = User.objects.create(
+        user = User.objects.create_user(
             username=self.username, password=self.password, type=self.type, phone=self.phone)
         token = Token.objects.create(user=user)
         data = {
 
             'username': '1234567899',
             'password': '123456',
-
+        }
         
         response = self.client.post(self.url, data)
         self.assertEqual(200, response.status_code)
-    '''
 
     def test_can_user_login_with_wrong_pass(self):
-        user = User.objects.create(
-            username=self.username, password=self.password, type=self.type, phone=self.phone)
+        user = User.objects.create_user(
+            username='1234567899', password='5745876587', type='Insured', phone=7897878787)
         token = Token.objects.create(user=user)
         data = {
 

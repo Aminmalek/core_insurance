@@ -44,7 +44,6 @@ EXTERNAL_APPS = [
     'rest_framework',
     'corsheaders',
 ]
-
 LOCAL_APPS = [
     'authenticate',
     'insurance',
@@ -55,6 +54,7 @@ LOCAL_APPS = [
     'Core',
 ]
 INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + LOCAL_APPS
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -94,33 +94,15 @@ WSGI_APPLICATION = 'Health_Insurance.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'dce4fg9oqeb3sh',
-        'USER': 'hvieuepruquicu',
-        'PASSWORD': '0e3bd7ef06fdc75876dd50db67fb7b23dcc97004d85d836860e6a64770bb236f',
-        'HOST': 'ec2-54-155-226-153.eu-west-1.compute.amazonaws.com',
+        'NAME': 'bime',
+        'USER': 'amin',
+        'PASSWORD': '123456',
+        'HOST': '127.0.0.1',
         'PORT': '5432',
     }
 }
 
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
-
-# Commented
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-
-]
+AUTH_PASSWORD_VALIDATORS = []
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -144,19 +126,12 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
-
 STATIC_URL = '/static/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Over rid django user
+# Overide django user
 AUTH_USER_MODEL = 'authenticate.User'
 
-# cors config
+# Cors config
 CORS_ORIGIN_ALLOW_ALL = True

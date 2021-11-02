@@ -89,12 +89,14 @@ def role_needed(*permissions):
             return f(*args, **kwargs)
         return decorated_function
     return decorator
-"""
-class TestView(APIView):
-    
-    @is_insured
-    @is_active
-    def get(self,request):
-        
-        return Response({"hello"})
-"""
+
+
+def type_check(*permissions):
+    def wrapper_func(self, request, user_type,*args, **Kwargs):
+        if request.user.type == "Company":
+            # change your logic here
+            return view(self, request, *args, **Kwargs)
+        else:
+            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
+    return wrapper_func
+

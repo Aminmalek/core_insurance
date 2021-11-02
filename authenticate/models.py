@@ -1,17 +1,15 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser,PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import UserManager
 
 
 class User(AbstractBaseUser):
     TYPE_CHOICES = [
-        ('Company', 'Company'),
-        ('Vendor', 'Vendor'),
-        ('Holder', 'Holder'),
-        ('SuperHolder', 'SuperHolder'),
-        ('Insured', 'Insured'),
+        (1, 'Company'),
+        (2, 'Vendor'),
+        (3, 'SuperHolder'),
+        (4, 'Holder'),
+        (5, 'Insured'),
     ]
     type = models.CharField(max_length=11, choices=TYPE_CHOICES)
     phone = models.BigIntegerField(null=True)
@@ -32,11 +30,13 @@ class User(AbstractBaseUser):
             'explicitly assigning them.'
         ),
     )
+    # code melli alghorithm and help text must be replaced with
     username = models.CharField(
         ('username'),
         max_length=150,
         unique=True,
-        help_text=('Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'), 
+        help_text=(
+            'Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
         error_messages={
             'unique': ("A user with that username already exists."),
         },
@@ -55,6 +55,7 @@ class User(AbstractBaseUser):
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser
+
     def has_module_perms(self, app_label):
         """
         Return True if the user has any permissions in the given app label.
@@ -64,7 +65,5 @@ class User(AbstractBaseUser):
         if self.is_active and self.is_superuser:
             return True
 
-       
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['phone', 'bank_account_number']
-   
