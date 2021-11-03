@@ -27,7 +27,7 @@ class SignupView(APIView):
             return Response({'error': 'Username or Phone number already exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
         else:
             user = User.objects.create_user(username=username, password=password, first_name=first_name,
-                                            last_name=last_name, phone=phone, type='Insured', bank_account_number=bank_account_number)
+                                            last_name=last_name, phone=phone, type=1, bank_account_number=bank_account_number)
             token = Token.objects.create(user=user)
             return Response({'token': token.key}, status=status.HTTP_201_CREATED)
 
@@ -89,13 +89,13 @@ class UserView(APIView):
     """
         For getting user list and updating users
     """
-    @is_company
+    @type_check(["Company"])
     def get(self, request):
         users = User.objects.all()
         users = UserSerializer(users, many=True)
         return Response(users.data)
 
-    @is_company
+    @type_check(["Company"])
     def put(self, request, id):
         data = request.data
         is_active = data['is_active']
@@ -113,13 +113,13 @@ class FinancialManagementView(APIView):
     """
         adding money to users wallet and can see it by that user
     """
-    @is_holder_superholder_insured
+    @type_check(["Holder","SuperHolder","Insured"])
     def get(self, request):
         user = request.user
         return Response(user.cash)
 
-    #type_check['SuperHolder',"Insured",'Holder]
-    @is_holder_superholder_insured
+    
+    @type_check(["Holder","SuperHolder","Insured"])
     def put(self, request):
         user = request.user
         data = request.data

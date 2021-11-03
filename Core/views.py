@@ -8,7 +8,7 @@ from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from Health_Insurance.settings import BASE_DIR
 from authenticate.models import User
-from .decorators import is_company
+from .decorators import type_check
 from .models import Message
 from .serializers import MessageSerializer
 
@@ -43,7 +43,7 @@ class FileView(APIView):
 
 class MessageView(APIView):
 
-    @is_company
+    @type_check (["Company",])
     def post(self, request):
         user = request.user
         data = request.data
@@ -57,7 +57,7 @@ class MessageView(APIView):
         else:
             return Response({"error": "please send your message first"}, status=status.HTTP_400_BAD_REQUEST)
 
-    @is_company
+    @type_check (["Company",])
     def get(self, request):
         user = request.user
         sender = request.query_params.get('sender', None)
@@ -70,7 +70,7 @@ class MessageView(APIView):
             serializer = MessageSerializer(message, many=True)
             return Response({"message": serializer.data})
 
-    @is_company
+    @type_check (["Company",])
     def put(self, request, id):
         user = request.user
         data = request.data
@@ -83,7 +83,7 @@ class MessageView(APIView):
         else:
             return Response({"error": "you can only update your messages"}, status=status.HTTP_400_BAD_REQUEST)
 
-    @is_company
+    @type_check (["Company",])
     def delete(self, request, id):
         user = request.user
         message = Message.objects.get(id=id)
@@ -92,3 +92,11 @@ class MessageView(APIView):
             return Response({"message": "message deleted successfuly"})
         else:
             return Response({"error": "you can only delete your messages"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TestView(APIView):
+    
+    @type_check (["Insured","SuperHolder","Company"])
+    def get(self,request):
+        user = request.user
+        return Response({"Heloooo":user.type,"ijoi":"oihoih"})

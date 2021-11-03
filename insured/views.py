@@ -7,25 +7,29 @@ from . serializers import InsuredSerializer
 from authenticate.models import User
 from Core.decorators import *
 
+permissions_dic = {"Company": 1, "Vendor": 2,
+                               "SuperHolder": 3, "Holder": 4, "Insured": 5}
+
 class InsuredView(APIView):
 
+    @type_check(["Company","Insured","Holder"])
     def get(self, request):
         user = request.user
-        if user.type == 'Company':
+        if user.type == 1:
             insureds = Insured.objects.all()
             serializer = InsuredSerializer(insureds, many=True)
             return Response(serializer.data)
-        elif user.type == 'Insured' or user.type == "Holder":
+        else : 
+            user.type == 5 or user.type == 4
             insured, created = Insured.objects.get_or_create(user=user)
             serializer = InsuredSerializer(insured)
             return Response(serializer.data)
-        else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
 
+    @type_check(["Holder"])
     def post(self, request):
         data = request.data
         user = request.user
-        if user.type == "Holder":
+        if user.type == 4:
 
             username = data['username']
             password = data['password']
@@ -43,7 +47,7 @@ class InsuredView(APIView):
                                             is_active=True,
                                             phone=phone,
                                             bank_account_number=bank_account_number,
-                                            type='Insured')
+                                            type=5)
             user.save()
             Insured.objects.create(user=user)
             #return Response({"message": "insured created successfuly"}, status=status.HTTP_201_CREATED)
@@ -65,15 +69,16 @@ class InsuredView(APIView):
             insured.supported_insureds.add(user)
         insured.save()
         return Response({"message": "insured updated successfuly"})
-
+        
+    @type_check(["Company","Holder"])
     def delete(self, request, id):
         user = request.user
         user_id = User.objects.get(id=id)
         insured = Insured.objects.get(user=user_id)
-        if user.type == 'Company':
+        if user.type == 1:
             user.delete()
             insured.delete()
-        elif user.type == "Holder":
+        elif user.type == 4:
             try:
                 insured.supported_insureds.remove(user)
                 insured.delete()

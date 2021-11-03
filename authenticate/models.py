@@ -1,21 +1,24 @@
 from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import UserManager
+from django.contrib.auth.models import UserManager , AbstractUser
+from django.utils import timezone
 
 
 class User(AbstractBaseUser):
-    TYPE_CHOICES = [
-        (1, 'Company'),
-        (2, 'Vendor'),
-        (3, 'SuperHolder'),
-        (4, 'Holder'),
-        (5, 'Insured'),
-    ]
-    type = models.CharField(max_length=11, choices=TYPE_CHOICES)
+
+    class Type(models.IntegerChoices):
+        Company = 1
+        Vendor = 2
+        SuperHolder = 3
+        Holder = 4
+        Insured = 5
+
+    type = models.IntegerField(choices=Type.choices,default=5)
     phone = models.BigIntegerField(null=True)
     bank_account_number = models.CharField(max_length=26)
     cash = models.IntegerField(default=0)
     email = models.EmailField(('email address'), blank=True)
+    date_joined = models.DateTimeField(('date joined'), default=timezone.now)
     is_staff = models.BooleanField(
         ('staff status'),
         default=False,

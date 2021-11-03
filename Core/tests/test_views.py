@@ -2,7 +2,7 @@ from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 from authenticate.models import User
 from django.urls import reverse
-from django.test.client import encode_multipart, RequestFactory
+from insurance.models import Insurance
 from Core.models import Message
 
 
@@ -11,7 +11,7 @@ class InsuranceTests(APITestCase):
     def setUp(self):
         self.username = "54872154"
         self.password = "123456"
-        self.type = "Company"
+        self.type = 1
         self.phone = 9128754652
         self.user = User.objects.create(
             username=self.username, password=self.password, type=self.type, phone=self.phone)
@@ -23,19 +23,19 @@ class InsuranceTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
     def test_1_user_copmany_post_messages(self):
-        User.objects.create(username=87542165,password=6545454,type="Company",phone=94578120)
+        User.objects.create(username=87542165,password=6545454,type=1,phone=94578120)
         data = {"message":"this is my message!","receiver":87542165}
         response = self.client.post(self.url,data)
         self.assertEqual(200, response.status_code)
 
     def test_2_user_copmany_cant_post_empty_messages(self):
-        User.objects.create(username=87542165,password=6545454,type="Company",phone=94578120)
+        User.objects.create(username=87542165,password=6545454,type=1,phone=94578120)
         data = {}
         response = self.client.post(self.url,data)
         self.assertEqual(400, response.status_code)
 
     def test_3_user_can_read_recieved_messages(self):
-        User.objects.create(username=87542165,password=6545454,type="Company",phone=94578120)
+        User.objects.create(username=87542165,password=6545454,type=1,phone=94578120)
         receiver = User.objects.get(username=87542165)
         Message.objects.create(sender=self.user,message="helloooo this is messageeee!!!",
         receiver=receiver)
@@ -43,14 +43,14 @@ class InsuranceTests(APITestCase):
         self.assertEqual(200, response.status_code)
 
     def test_4_user_can_read_his_send_messages(self):
-        User.objects.create(username=87542165,password=6545454,type="Company",phone=94578120)
+        User.objects.create(username=87542165,password=6545454,type=1,phone=94578120)
         receiver = User.objects.get(username=87542165)
         Message.objects.create(sender=self.user,message="helloooo this is messageeee!!!",
         receiver=receiver)
         response = self.client.get(self.url)
         self.assertEqual(200, response.status_code)
         
-'''
+
     def test_user_copmany_can_post_insurances(self):
         data = {"name": "some insurance!",
                 "description": "this is an insurance",
@@ -66,12 +66,7 @@ class InsuranceTests(APITestCase):
                                "how much": 8456,
                                "when": "1400/02/05"}}
 
-        content = encode_multipart('BoUnDaRyStRiNg', data)
-        content_type = 'multipart/form-data; boundary=BoUnDaRyStRiNg'
-        response = factory.post('/api/insurance' ,content, content_type=content_type)
-        self.assertEqual(
-            {"message": "insurance created successfuly"}, response)
-
+        
 
     def test_user_none_copmany_can_post_insurances(self):
 
@@ -183,5 +178,3 @@ class InsuranceTests(APITestCase):
             name="some insurance!", description="this is an insurance")
 
         response = self.client.delete('/api/insurance/1')
-        self.assertEqual(403, response.status_code)
-'''
