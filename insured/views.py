@@ -7,8 +7,6 @@ from . serializers import InsuredSerializer
 from authenticate.models import User
 from Core.decorators import *
 
-permissions_dic = {"Company": 1, "Vendor": 2,
-                               "SuperHolder": 3, "Holder": 4, "Insured": 5}
 
 class InsuredView(APIView):
 

@@ -1,4 +1,4 @@
-from django.db.models.query_utils import RegisterLookupMixin
+
 from authenticate.models import User
 from insured.models import Insured
 from payment.serializers import InsuranceConnectorSerializer
@@ -7,24 +7,26 @@ from payment.models import InsuranceConnector
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from Core.decorators import is_company, is_holder_insured
+from Core.decorators import type_check
 
 
 class InsuranceConnectorView(APIView):
+
+    @type_check(["Company","Holder","SuperHolder","Insured"])
     def get(self, request):
         user = request.user
-        if user.type == "Company":
+        if user.type == 1:
             insurance_connector = InsuranceConnector.objects.all()
             insurance_connector = InsuranceConnectorSerializer(
                 insurance_connector, many=True)
             return Response(insurance_connector.data)
-        elif user.type == "Holder" or user.type == "SuperHolder":
+        elif user.type == 4 or user.type == 3:
             insurance_connector = InsuranceConnector.objects.filter(
                 user=user)
             insurance_connector = InsuranceConnectorSerializer(
                 insurance_connector, many=True)
             return Response(insurance_connector.data)
-        elif user.type == "Insured":
+        elif user.type == 5:
             parent = Insured.objects.get(supported_insureds=user)
             insurance_connector = InsuranceConnector.objects.filter(
                 user=parent.user)
@@ -32,9 +34,9 @@ class InsuranceConnectorView(APIView):
                 insurance_connector, many=True)
             return Response(insurance_connector.data)
         else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"error": "somne thing went wrong"},status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @is_holder_insured
+    @type_check(["Holder","Insured"])
     def post(self, request):
         data = request.data
         user = request.user
@@ -46,13 +48,13 @@ class InsuranceConnectorView(APIView):
             user.cash = int(user.cash) - int(insurance.price)
             InsuranceConnector.objects.create(
                 user=user, insurance=insurance, register_form=register_form, is_paid=True)
-            user.type = "Holder"
+            user.type = 4
             user.save()
         else:
             return Response({"error": "you have not enough money to buy insurance"}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message": "insurance purchased successfuly"}, status=status.HTTP_201_CREATED)
 
-    @is_company
+    @type_check(["Company"])
     def put(self, request, id):
         data = request.data
         insurance_connector = InsuranceConnector.objects.get(id=id)

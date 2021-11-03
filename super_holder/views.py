@@ -6,26 +6,24 @@ from rest_framework import status
 from .models import SuperHolder
 from .serializers import SuperHolderSerializer
 from authenticate.models import User
-from Core.decorators import *
-
+from Core.decorators import type_check
 
 class SuperHolderView(APIView):
 
+    @type_check(["Company","SuperHolder"])
     def get(self, request):
         user = request.user
-        if user.type == 'Company':
+        if user.type == 1:
             superholders = SuperHolder.objects.all()
             serializer = SuperHolderSerializer(superholders, many=True)
             return Response(serializer.data)
-        elif user.type == 'SuperHolder':
+        elif user.type == 3:
             superholder, created = SuperHolder.objects.get_or_create(
                 user=user)
             serializer = SuperHolderSerializer(superholder)
             return Response(serializer.data)
-        else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
-
-    @is_super_holder
+        
+    @type_check(["SuperHolder"])
     def post(self, request):
         data = request.data
         username = data['username']
@@ -37,14 +35,14 @@ class SuperHolderView(APIView):
         if User.objects.filter(username=username).exists() or User.objects.filter(phone=phone).exists():
             return Response({'error': 'Username or Phone number already exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
         user = User.objects.create_user(username=username, password=password, first_name=first_name,
-                                        last_name=last_name, is_active=True, phone=phone, bank_account_number=bank_account_number, type='Holder')
+                                        last_name=last_name, is_active=True, phone=phone, bank_account_number=bank_account_number, type=4)
         user.save()
         Insured.objects.create(user=user)
         SuperHolder.objects.get(
             user=request.user).supported_holders.add(user)
         return Response({"message": "holder created successfuly"}, status=status.HTTP_201_CREATED)
 
-    @is_super_holder
+    @type_check(["SuperHolder"])
     def put(self, request):
         
         data = request.data
@@ -56,15 +54,16 @@ class SuperHolderView(APIView):
         super_holder.save()
         return Response({"message": "super holder updated successfuly"})
 
+    @type_check(["Company","SuperHolder",'Holder'])
     def delete(self, request, id):
         user = request.user
-        if user.type == 'Company' or user.type == 'SuperHolder':
+        if user.type == 1 or user.type == 3:
             insured_user = User.objects.get(id=id)
-            if insured_user.type == 'Holder':
+            if insured_user.type == 4:
                 if Insured.objects.filter(user=insured_user).exists():
                     insured = Insured.objects.get(user=insured_user)
                     supported_holder = SuperHolder.objects.get(user=user)
-                    if user.type == "SuperHolder":
+                    if user.type == 3:
                         try:
                             supported_holder.supported_holders.remove(
                                 insured_user)
@@ -80,5 +79,4 @@ class SuperHolderView(APIView):
                     return Response({"message": "Holder does not exist"}, status=status.HTTP_404_NOT_FOUND)
             else:
                 return Response({"message": "you can only delete holders"}, status=status.HTTP_403_FORBIDDEN)
-        else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
+    
