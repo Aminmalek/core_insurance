@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import FileView,MessageView
+from .views import FileView, MessageView
 
 urlpatterns = [
     path('media', FileView.as_view(), name="media"),

@@ -7,6 +7,7 @@ from .serializers import UserSerializer
 from .models import User
 from Core.decorators import *
 
+
 class SignupView(APIView):
     """
         This API receives signup data, creates the user and logs in with the created user
@@ -21,13 +22,13 @@ class SignupView(APIView):
         first_name = data['first_name']
         last_name = data['last_name']
         phone = data['phone']
+        bank_account_number = data['bank_account_number']
         if User.objects.filter(username=username).exists() or User.objects.filter(phone=phone).exists():
             return Response({'error': 'Username or Phone number already exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
         else:
             user = User.objects.create_user(username=username, password=password, first_name=first_name,
-                                            last_name=last_name, phone=phone, type='Insured')
+                                            last_name=last_name, phone=phone, type=1, bank_account_number=bank_account_number)
             token = Token.objects.create(user=user)
-            user.save()
             return Response({'token': token.key}, status=status.HTTP_201_CREATED)
 
 
@@ -43,8 +44,6 @@ class LoginView(APIView):
         username = data['username']
         password = data['password']
         user = auth.authenticate(username=username, password=password)
-        # this makes tests pass
-        #user = User.objects.get(username=username,password=password)
         if user:
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key})
@@ -90,13 +89,13 @@ class UserView(APIView):
     """
         For getting user list and updating users
     """
-    @is_company
+    @type_check(["Company"])
     def get(self, request):
         users = User.objects.all()
         users = UserSerializer(users, many=True)
         return Response(users.data)
-        
-    @is_company
+
+    @type_check(["Company"])
     def put(self, request, id):
         data = request.data
         is_active = data['is_active']
@@ -114,18 +113,18 @@ class FinancialManagementView(APIView):
     """
         adding money to users wallet and can see it by that user
     """
-    @is_holder_superholder_insured
-    def get(self,request):
+    @type_check(["Holder","SuperHolder","Insured"])
+    def get(self, request):
         user = request.user
-        user = User.objects.get(username=user.username)
         return Response(user.cash)
 
-    @is_holder_superholder_insured    
-    def put(self,request):
+    
+    @type_check(["Holder","SuperHolder","Insured"])
+    def put(self, request):
         user = request.user
         data = request.data
         cash = data['cash']
-        user = User.objects.get(username=user.username)
-        user.cash = int(cash) + int(user.cash)
+        user.cash = int(cash) + user.cash
         user.save()
-        return Response({"message":"Money added to your account successfully"})
+        return Response({"message": "user cash updated successfully"})
+

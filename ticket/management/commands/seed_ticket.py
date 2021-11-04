@@ -4,6 +4,7 @@ from insurance.models import Insurance
 from ticket.models import Ticket, Claim
 from payment.models import InsuranceConnector
 
+
 class Command(BaseCommand):
     """
     creates some database objects to for development and testing

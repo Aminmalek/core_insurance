@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from .models import Insurance
 from .serializers import InsuranceSerializer
-from Core.decorators import *
+from Core.decorators import type_check
 import json
 import uuid
 
@@ -33,11 +33,11 @@ class InsuranceView(APIView):
             serializer = InsuranceSerializer(insurance, many=True)
             return Response(serializer.data)
 
-    #@is_company
+    @type_check(["Company",])
     def post(self, request):
         data = request.data
         user = request.user
-        if user.type == 'Company':
+        if user.type == 1:
             name = data['name']
             description = data['description']
             price = data['price']
@@ -51,7 +51,7 @@ class InsuranceView(APIView):
                     name=name, description=description, price=price, register_form=register_form, claim_form=claim_form)
             return Response({"message": "insurance created successfuly"}, status=status.HTTP_201_CREATED)
  
-    @is_company
+    @type_check(["Company",])
     def put(self, request, id):
         data = request.data
         name = data['name']
@@ -67,7 +67,7 @@ class InsuranceView(APIView):
         else:
             return Response({"message": "insurance doesn't exist"}, status=status.HTTP_400_BAD_REQUEST)
 
-    @is_company
+    @type_check(["Company",])
     def delete(self, request, id):
         insurance = Insurance.objects.filter(id=id)
         if insurance:

@@ -6,15 +6,17 @@ from ticket.models import Ticket
 from django.urls import reverse
 from insurance.models import Insurance
 
+permissions_dic = {"Company": 1, "Vendor": 2,
+                               "SuperHolder": 3, "Holder": 4, "Insured": 5}
 
 class PaymentTests(APITestCase):
 
     def setUp(self):
         """ Tests setup and register user
         """
-        self.username = "amin"
+        self.username = "35465635241"
         self.password = "123456"
-        self.type = "Holder"
+        self.type = 4
         self.cash = 500
         self.user = User.objects.create(
             username=self.username, password=self.password, type=self.type,cash=self.cash)
@@ -28,7 +30,7 @@ class PaymentTests(APITestCase):
     
     def test_1_user_vendor_cant_view_insurance_connectors(self):
         user = User.objects.create(
-            username="company", password="123456", type="Vendor")
+            username="company", password="123456", type=2)
         Ticket.objects.create(name="some ticket",
                               user=user, description="some thing")
         self.new_token = Token.objects.create(user=user)
@@ -39,7 +41,7 @@ class PaymentTests(APITestCase):
 
     def test_2_user_can_view_insurance_connectors(self):
         user = User.objects.create(
-            username="company", password="123456", type="Company")
+            username="company", password="123456", type=1)
         Ticket.objects.create(name="some ticket",
                               user=user, description="some thing")
         self.new_token = Token.objects.create(user=user)
@@ -84,7 +86,7 @@ class PaymentTests(APITestCase):
 
     def test_5_users_type_changes_after_buy_insurance(self):
         user = User.objects.create(
-            username="54875466", password="123456", type="Insured",cash=878)
+            username="54875466", password="123456", type=5,cash=878)
         self.new_token = Token.objects.create(user=user)
         self.client.credentials(
             HTTP_AUTHORIZATION='Token ' + self.new_token.key)
@@ -102,11 +104,11 @@ class PaymentTests(APITestCase):
         response = self.client.post(self.url, format='json', data=data)
         user = User.objects.get(username="54875466")
         connector = InsuranceConnector.objects.get(insurance=54)
-        self.assertEqual("Holder",user.type)
+        self.assertEqual(4,user.type)
 
     def test_6_error_if_user_money_is_low(self):
         user = User.objects.create(
-            username="54875466", password="123456", type="Insured",cash=8)
+            username="54875466", password="123456", type=5,cash=8)
         self.new_token = Token.objects.create(user=user)
         self.client.credentials(
             HTTP_AUTHORIZATION='Token ' + self.new_token.key)
@@ -127,7 +129,7 @@ class PaymentTests(APITestCase):
 
     def test_7_is_paid_changes_after_buy_insurance(self):
         user = User.objects.create(
-            username="54875466", password="123456", type="Insured",cash=878)
+            username="54875466", password="123456", type=5,cash=878)
         self.new_token = Token.objects.create(user=user)
         self.client.credentials(
             HTTP_AUTHORIZATION='Token ' + self.new_token.key)
@@ -149,7 +151,7 @@ class PaymentTests(APITestCase):
 
     def test_8_company_can_update_insurance_connector(self):
         user=User.objects.create(
-            username = "company", password = "123456", type = "Company")
+            username = "42742452452", password = "123456", type = 1)
         self.new_token=Token.objects.create(user = user)
         self.client.credentials(
             HTTP_AUTHORIZATION = 'Token ' + self.new_token.key)
@@ -175,7 +177,7 @@ class PaymentTests(APITestCase):
 
     def test_9_none_holder_user_can_post_insurance_connector(self):
         user = User.objects.create(
-            username="company", password="123456", type="Company")
+            username="company", password="123456", type=1)
         Ticket.objects.create(name="some ticket",
                               user=user, description="some thing")
         self.new_token = Token.objects.create(user=user)

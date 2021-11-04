@@ -13,7 +13,7 @@ class SuperHolderTests(APITestCase):
 
         self.username = "superholder1"
         self.password = "123456"
-        self.type = "SuperHolder"
+        self.type = 3
         self.user = User.objects.create(
             username=self.username, password=self.password, type=self.type)
 
@@ -26,7 +26,7 @@ class SuperHolderTests(APITestCase):
 
     def test_user_Company_view_superHolders(self):
         company_user = User.objects.create(
-            username="mamad_gholi", password="123456", type="Company")
+            username="mamad_gholi", password="123456", type=1)
         new_token = Token.objects.create(user=company_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
         response = self.client.get(self.url)
@@ -38,7 +38,7 @@ class SuperHolderTests(APITestCase):
 
     def test_user_none_superHolder_or_company_can_view_or_create_superHolders(self):
         some_user = User.objects.create(
-            username="company", password="123456", type="Vendor")
+            username="company", password="123456", type=2)
         new_token = Token.objects.create(user=some_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
         response = self.client.get(self.url)
@@ -79,7 +79,7 @@ class SuperHolderTests(APITestCase):
     def test_superHolder_can_can_add_repetetive_holder(self):
         super_holder = SuperHolder.objects.create(user=self.user)
         user = User.objects.create(
-            username='87542132', password='123456', type='Insured')
+            username='87542132', password='123456', type=5)
         data = {
 
             'username': '87542132',
@@ -96,12 +96,12 @@ class SuperHolderTests(APITestCase):
 
     def test_any_user_can_add_holder(self):
         company_user = User.objects.create(
-            username="company", password="123456", type="Vendor")
+            username="company", password="123456", type=2)
         new_token = Token.objects.create(user=company_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
         super_holder = SuperHolder.objects.create(user=self.user)
         user = User.objects.create(
-            username='87542132', password='123456', type='Insured')
+            username='87542132', password='123456', type=5)
         data = {
 
             'username': '87542132',
@@ -117,12 +117,12 @@ class SuperHolderTests(APITestCase):
 
     def test_superholder_can_add_holder(self):
         user = User.objects.create(
-            username="super1", password="123456", type="SuperHolder")
+            username="super1", password="123456", type=3)
         super_holder = SuperHolder.objects.create(user=user)
         new_token = Token.objects.create(user=user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
-        user2 = User.objects.create(id=125,username='2121215485', password='123456',type="Holder")
-        user3 = User.objects.create(id=498,username='8765465468', password='123456',type="Holder")
+        user2 = User.objects.create(id=125,username='2121215485', password='123456',type=4)
+        user3 = User.objects.create(id=498,username='8765465468', password='123456',type=4)
         data1 = {"supported_holders": user2.id}
         data2 = {"supported_holders": user3.id}
         response = self.client.put('/api/superholder', data1)
@@ -139,8 +139,8 @@ class SuperHolderTests(APITestCase):
         self.assertEqual(200, response.status_code)
         
     def test_superholder_can_delete_holder(self):
-        holder1 = User.objects.create(id=564,username='001245789', password='123456',type="Holder")
-        holder2 = User.objects.create(id=548,username='021654654', password='123456',type="Holder")
+        holder1 = User.objects.create(id=564,username='001245789', password='123456',type=4)
+        holder2 = User.objects.create(id=548,username='021654654', password='123456',type=4)
         Insured.objects.create(user=holder1)
         Insured.objects.create(user=holder2)
         super_holder = SuperHolder.objects.create(user=self.user)

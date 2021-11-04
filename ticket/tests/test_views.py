@@ -15,7 +15,7 @@ class TicketsTests(APITestCase):
         """
         self.username = "user1"
         self.password = "123456"
-        self.type = "Holder"
+        self.type = 4
         self.user = User.objects.create(
             username=self.username, password=self.password, type=self.type)
         self.url = reverse("ticket")
@@ -35,7 +35,7 @@ class TicketsTests(APITestCase):
 
     def test_insured_can_add_tickets(self):
         insured_user = User.objects.create(
-            username="company", password="123456", type="Insured")
+            username=1, password="123456", type=5)
         Ticket.objects.create(name="some ticket",
                               user=insured_user, description="some thing")
         self.new_token = Token.objects.create(user=insured_user)
@@ -58,7 +58,7 @@ class TicketsTests(APITestCase):
 
     def test_fake_user_can_view_tickets(self):
         insured_user = User.objects.create(
-            username="company", password="123456",)
+            username=1, password="123456",type=10)
         Ticket.objects.create(name="some ticket",
                               user=insured_user, description="some thing")
         self.new_token = Token.objects.create(user=insured_user)
@@ -70,7 +70,7 @@ class TicketsTests(APITestCase):
 
     def test_ticket_serializers(self):
         insured_user = User.objects.create(
-            username="company", password="123456", type="Insured")
+            username=1, password="123456", type=5)
 
         self.new_token = Token.objects.create(user=insured_user)
         self.client.credentials(
@@ -85,7 +85,7 @@ class TicketsTests(APITestCase):
 '''
     def test_none_vendor_can_update_ticket(self):
         fake_user = User.objects.create(
-        username="company", password="123456", type="Company")
+        username=1, password="123456", type=1)
         Ticket.objects.create(name="some ticket", user=fake_user,description="some thing")
         self.new_token = Token.objects.create(user=fake_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.new_token.key)
@@ -101,7 +101,7 @@ class ClaimTests(APITestCase):
         """
         self.username = "user1"
         self.password = "123456"
-        self.type = "Insured"
+        self.type = 5
         self.user = User.objects.create(
             username=self.username, password=self.password, type=self.type)
         self.url = reverse("claim")
@@ -118,7 +118,7 @@ class ClaimTests(APITestCase):
 
     def test_user_Holder_can_view_his_claims(self):
         insured_user = User.objects.create(
-            username="35685754", password="123456", type="Holder")
+            username="35685754", password="123456", type=4)
         self.new_token = Token.objects.create(user=insured_user)
         self.client.credentials(
             HTTP_AUTHORIZATION='Token ' + self.new_token.key)
@@ -127,7 +127,7 @@ class ClaimTests(APITestCase):
 
     def test_user_Company_can_view_all_claims(self):
         insured_user = User.objects.create(
-            username="35685754", password="123456", type="Company")
+            username="35685754", password="123456", type=1)
         self.new_token = Token.objects.create(user=insured_user)
         self.client.credentials(
             HTTP_AUTHORIZATION='Token ' + self.new_token.key)
@@ -150,7 +150,7 @@ class ClaimTests(APITestCase):
 
     def test_user_Holder_can_post_claims(self):
         holder_user = User.objects.create(
-            username="35685754", password="123456", type="Holder")
+            username="35685754", password="123456", type=4)
         self.new_token = Token.objects.create(user=holder_user)
         self.client.credentials(
             HTTP_AUTHORIZATION='Token ' + self.new_token.key)
@@ -169,7 +169,7 @@ class ClaimTests(APITestCase):
 
     def test_some_user_can_post_claims(self):
         holder_user = User.objects.create(
-            username="35685754", password="123456", type="Vendor")
+            username="35685754", password="123456", type=2)
         self.new_token = Token.objects.create(user=holder_user)
         self.client.credentials(
             HTTP_AUTHORIZATION='Token ' + self.new_token.key)
@@ -188,7 +188,7 @@ class ClaimTests(APITestCase):
 
     def test_Company_can_change_claim_status(self):
         _user = User.objects.create(
-        username="35685754", password="123456", type="Company")
+        username="35685754", password="123456", type=1)
         self.new_token = Token.objects.create(user=_user)
         self.client.credentials(
             HTTP_AUTHORIZATION='Token ' + self.new_token.key)
@@ -211,7 +211,7 @@ class ClaimTests(APITestCase):
 
     def test_Holder_cant_change_claim_status(self):
         _user = User.objects.create(
-        username="35685754", password="123456", type="Holder")
+        username="35685754", password="123456", type=4)
         self.new_token = Token.objects.create(user=_user)
         self.client.credentials(
             HTTP_AUTHORIZATION='Token ' + self.new_token.key)

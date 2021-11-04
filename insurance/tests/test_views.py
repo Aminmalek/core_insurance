@@ -3,9 +3,7 @@ from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 from authenticate.models import User
 from django.urls import reverse
-from django.test.client import encode_multipart, RequestFactory
 
-factory = RequestFactory()
 
 class InsuranceTests(APITestCase):
 
@@ -13,7 +11,7 @@ class InsuranceTests(APITestCase):
 
         self.username = "company1"
         self.password = "123456"
-        self.type = "Company"
+        self.type = 1
         self.phone = 9128754652
         self.user = User.objects.create(
             username=self.username, password=self.password, type=self.type, phone=self.phone)
@@ -44,17 +42,15 @@ class InsuranceTests(APITestCase):
                                "how much": 8456,
                                "when": "1400/02/05"}}
 
-        content = encode_multipart('BoUnDaRyStRiNg', data)
-        content_type = 'multipart/form-data; boundary=BoUnDaRyStRiNg'
-        response = factory.post('/api/insurance' ,content, content_type=content_type)
+     
+        response = self.client.post(self.url,  format='json', data=data)
         self.assertEqual(
-            {"message": "insurance created successfuly"}, response)
+            {"message": "insurance created successfuly"}, response.data)
 
-'''
     def test_user_none_copmany_can_post_insurances(self):
 
         none_company_user = User.objects.create(
-            username="mamad_gholi", password="123456", type="Insured")
+            username="mamad_gholi", password="123456", type=5)
         new_token = Token.objects.create(user=none_company_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
         data = {"name": "some insurance!",
@@ -71,7 +67,7 @@ class InsuranceTests(APITestCase):
                                "how much": 8456,
                                "when": "1400/02/05"}
                 }
-        response = self.client.post(self.url,  content_type="multipart/form-data", data=data)
+        response = self.client.post(self.url,  format='json', data=data)
         self.assertEqual(403, response.status_code)
 
     def test_user_copmany_can_post_duplicate_insurances(self):
@@ -121,7 +117,7 @@ class InsuranceTests(APITestCase):
     def test_user_none_company_can_update_insurances(self):
 
         none_company_user = User.objects.create(
-            username="mamad_gholi", password="123456", type="Insured")
+            username="mamad_gholi", password="123456", type=5)
         new_token = Token.objects.create(user=none_company_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
         Insurance.objects.create(
@@ -154,7 +150,7 @@ class InsuranceTests(APITestCase):
     def test_user_none_copmany_can_delete_insurances(self):
 
         none_company_user = User.objects.create(
-            username="mamad_gholi", password="123456", type="Insured")
+            username="mamad_gholi", password="123456", type=5)
         new_token = Token.objects.create(user=none_company_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + new_token.key)
         Insurance.objects.create(
@@ -162,4 +158,3 @@ class InsuranceTests(APITestCase):
 
         response = self.client.delete('/api/insurance/1')
         self.assertEqual(403, response.status_code)
-'''

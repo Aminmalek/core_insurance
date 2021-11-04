@@ -38,3 +38,4 @@ class Command(BaseCommand):
         self.stdout.write("insurances created")
     def handle(self, *args, **kwargs):
         self.create_insurances()
+        self.stdout.write("insurances created")

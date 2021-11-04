@@ -17,9 +17,11 @@ class TestSignup(APITestCase):
             "password": "123456",
             "first_name": "Gholam",
             "last_name": "Gholami",
-            "phone": "3543543543"
+            "phone": "3543543543",
+            "bank_account_number":63574657463546574635
         }
         response = self.client.post('/api/auth/register', data)
+        User.objects.get(username="354354354")
         self.assertEqual(201, response.status_code)
 
     def test_2_user_can_register_with_repetitive_username(self):
@@ -32,7 +34,8 @@ class TestSignup(APITestCase):
             "password": "123456",
             "first_name": "Gholam",
             "last_name": "Gholami",
-            "phone": "3543543543"
+            "phone": "3543543543",
+            "bank_account_number":63574657463546574635
         }
         response = self.client.post('/api/auth/register', data)
         self.assertEqual(406, response.status_code)
@@ -44,27 +47,25 @@ class TestLoginView(APITestCase):
         self.url = reverse("login")
         self.username = "1234567899"
         self.password = "123456"
-        self.type = "Company"
+        self.type = 1
         self.phone = "3546345"
-    # this test is not pass
-    '''
+    
     def test_can_user_login(self):
-        user = User.objects.create(
+        user = User.objects.create_user(
             username=self.username, password=self.password, type=self.type, phone=self.phone)
         token = Token.objects.create(user=user)
         data = {
 
             'username': '1234567899',
             'password': '123456',
-
+        }
         
         response = self.client.post(self.url, data)
         self.assertEqual(200, response.status_code)
-    '''
 
     def test_can_user_login_with_wrong_pass(self):
-        user = User.objects.create(
-            username=self.username, password=self.password, type=self.type, phone=self.phone)
+        user = User.objects.create_user(
+            username='1234567899', password='5745876587', type=1, phone=7897878787)
         token = Token.objects.create(user=user)
         data = {
 
@@ -81,7 +82,7 @@ class Testlogout(APITestCase):
     def setUp(self):
         self.username = "company1"
         self.password = "123456"
-        self.type = "Company"
+        self.type = 1
         self.phone = "3546345"
         self.user = User.objects.create(
             username=self.username, password=self.password, type=self.type, phone=self.phone)
@@ -102,7 +103,7 @@ class TestGetUserView(APITestCase):
     def setUp(self):
         self.username = "company1"
         self.password = "123456"
-        self.type = "Company"
+        self.type = 1
         self.phone = "3546345"
         self.user = User.objects.create(
             username=self.username, password=self.password, type=self.type, phone=self.phone)
@@ -125,7 +126,7 @@ class TestUserView(APITestCase):
     def setUp(self):
         self.username = "company1"
         self.password = "123456"
-        self.type = "Company"
+        self.type = 1
         self.phone = "3546345"
         self.user = User.objects.create(
             username=self.username, password=self.password, type=self.type, phone=self.phone)
@@ -150,7 +151,7 @@ class TestUserView(APITestCase):
         new_user = User.objects.create(
             username=8751684,
             password=123456,
-            type="Insured",
+            type=5,
             phone=9104565789
         )
 
@@ -168,25 +169,25 @@ class TestUserView(APITestCase):
 
     def test_company_user_can_update_user_data(self):
         User.objects.create(username=6874654654, password=12345678,
-                            phone=912456887, type="Vendor", is_active=False)
+                            phone=912456887, type=2, is_active=False)
         User.objects.filter(username=6874654654).update(id=123)
         
         data = {
             "is_active": True,
-            "type": "Insured"
+            "type": 5
         }
         response = self.client.put("/api/auth/user/123", data)
         user = User.objects.get(username=6874654654)
         types = user.type
         self.assertEquals(user.is_active, True)
-        self.assertEquals(types,"Insured")
+        self.assertEquals(types,5)
         
 
     def test_none_company_user_can_update_user_data(self):
         new_user = User.objects.create(
             username=8751684,
             password=123456,
-            type="Insured",
+            type=5,
             phone=9104565789
         )
 
@@ -194,10 +195,10 @@ class TestUserView(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
         user = User.objects.create(
-            username=687654654654, password=12345678, phone=912456887, type="Vendor")
+            username=687654654654, password=12345678, phone=912456887, type=2)
         data = {
             "is_active": True,
-            "type": "Insured"
+            "type": 5
         }
         response = self.client.put("/api/auth/user/1", data)
 
