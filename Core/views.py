@@ -43,13 +43,13 @@ class FileView(APIView):
 
 class MessageView(APIView):
 
-    @type_check (["Company",])
+    @type_check (["Company","Vendor"])
     def post(self, request):
         user = request.user
         data = request.data
-        receiver = data['receiver']
-        message = data['message']
         if data:
+            receiver = data['receiver']
+            message = data['message']
             receiver = User.objects.get(username=receiver)
             Message.objects.create(
                 sender=user, message=message, receiver=receiver)
@@ -57,7 +57,7 @@ class MessageView(APIView):
         else:
             return Response({"error": "please send your message first"}, status=status.HTTP_400_BAD_REQUEST)
 
-    @type_check (["Company",])
+    @type_check (["Company","Vendor"])
     def get(self, request):
         user = request.user
         sender = request.query_params.get('sender', None)
@@ -68,9 +68,9 @@ class MessageView(APIView):
         else:
             message = Message.objects.filter(receiver=user.id)
             serializer = MessageSerializer(message, many=True)
-            return Response({"message": serializer.data})
+            return Response(serializer.data)
 
-    @type_check (["Company",])
+    @type_check (["Company","Vendor"])
     def put(self, request, id):
         user = request.user
         data = request.data
@@ -83,7 +83,7 @@ class MessageView(APIView):
         else:
             return Response({"error": "you can only update your messages"}, status=status.HTTP_400_BAD_REQUEST)
 
-    @type_check (["Company",])
+    @type_check (["Company","Vendor"])
     def delete(self, request, id):
         user = request.user
         message = Message.objects.get(id=id)
@@ -93,10 +93,3 @@ class MessageView(APIView):
         else:
             return Response({"error": "you can only delete your messages"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-class TestView(APIView):
-    
-    @type_check (["Insured","SuperHolder","Company"])
-    def get(self,request):
-        user = request.user
-        return Response({"Heloooo":user.type,"ijoi":"oihoih"})
