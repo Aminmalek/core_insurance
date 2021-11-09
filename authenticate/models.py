@@ -12,6 +12,7 @@ class User(AbstractBaseUser):
         SuperHolder = 3
         Holder = 4
         Insured = 5
+        CompanyAdmin = 6
 
     type = models.IntegerField(choices=Type.choices,default=5)
     phone = models.BigIntegerField(null=True)
