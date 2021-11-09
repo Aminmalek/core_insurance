@@ -42,13 +42,13 @@ class Claim(models.Model):
     claim_form = models.JSONField()
     is_archived = models.BooleanField(default=False)
     reviewer = models.ForeignKey(
-        User, on_delete=models.PROTECT, null=True, blank=True)
+        User, on_delete=models.PROTECT, null=True, blank=True,related_name="reviewer")
     franchise = models.IntegerField(null=True)
     tarrif = models.IntegerField(null=True)
     payable_amount = models.IntegerField(null=True)
     deducations = models.IntegerField(null=True)
     vendor = models.ForeignKey(
-        User, on_delete=models.PROTECT, null=True, blank=True)
+        User, on_delete=models.PROTECT, null=True, blank=True,related_name="vendor")
     claimed_amount = models.IntegerField(null=True)
     claim_date = models.DateTimeField(null=True)
     specefic_name = models.CharField(max_length=50)
