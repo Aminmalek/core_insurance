@@ -64,7 +64,7 @@ class TicketView(APIView):
 
 class ClaimView(APIView):
 
-    @type_check(["Company", "Holder", "SuperHolder", "Insured"])
+    @type_check(["Company", "Holder", "SuperHolder", "Insured", 'CompanyAdmin'])
     def get(self, request, id=None):
         user = request.user
         if user.type == 4 or user.type == 5 or user.type == 3:
@@ -75,7 +75,7 @@ class ClaimView(APIView):
                 claims = Claim.objects.filter(user=user)
                 serializer = ClaimSerializer(claims, many=True)
 
-        elif user.type == 1:
+        elif user.type == 1 or user.type == 6:
             if id:
                 claims = Claim.objects.get(id=id)
                 serializer = ClaimSerializer(claims)
@@ -84,7 +84,7 @@ class ClaimView(APIView):
                 serializer = ClaimSerializer(claims, many=True)
         return Response(serializer.data)
 
-    @type_check(["Holder", "Insured", "Company", "SuperHolder"])
+    @type_check(["Holder", "Insured", "Company", "SuperHolder", "CompanyAdmin"])
     def post(self, request):
         data = request.data
         user = request.user
@@ -102,7 +102,7 @@ class ClaimView(APIView):
                 coverage=coverage, claimed_amount=claimed_amount, claim_date=claim_date)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
-        elif user.type == 1:
+        elif user.type == 1 or  user.type == 1:
             username = data['username']
             insurance = data['insurance_id']
             description = data['description']
@@ -116,11 +116,12 @@ class ClaimView(APIView):
                 user=user, insurance=insurance, status='Opened', claim_form=claim_form,
                 description=description, coverage=coverage, claimed_amount=claimed_amount, claim_date=claim_date)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
-    @type_check(["Company", "Holder", "Insured","SuperHolder"])
+
+    @type_check(["Company", "Holder", "Insured", "SuperHolder",'CompanyAdmin'])
     def put(self, request, id):
         data = request.data
         user = request.user
-        if user.type == 1:
+        if user.type == 1 or user.type == 6:
             response = data['response']
             claim_status = data['status']
             reviewer = data['reviewer']
@@ -179,7 +180,7 @@ class ClaimView(APIView):
             else:
                 return Response({"message": "user can't update your claim without company request"}, status=status.HTTP_403_FORBIDDEN)
 
-    @type_check(["Holder", "Insured","SuperHolder"])
+    @type_check(["Holder", "Insured", "SuperHolder"])
     def delete(self, request, id):
         user = request.user
         claim = Claim.objects.get(id=id)
