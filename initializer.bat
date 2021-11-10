@@ -6,8 +6,20 @@ call venv\scripts\activate.bat
 echo "installing requirements"
 call pip install -r requirements.txt
 
+echo "delete cashe"
+call del /f /s /q .\Health_Insurance\__pycache__\*
+
+echo "delete old migrations"
+call del /f /s /q .\authenticate\migrations\*
+call del /f /s /q .\core\migrations\*
+call del /f /s /q .\insurance\migrations\*
+call del /f /s /q .\insured\migrations\*
+call del /f /s /q .\payment\migrations\*
+call del /f /s /q .\super_holder\migrations\*
+call del /f /s /q .\ticket\migrations\*
+
 echo "creating database"
-call python manage.py makemigrations authenticate insurance insured super_holder payment ticket vendor
+call python manage.py makemigrations authenticate insurance insured payment super_holder ticket
 call python manage.py migrate
 
 echo "creating user"
