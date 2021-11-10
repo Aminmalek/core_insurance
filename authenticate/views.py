@@ -91,7 +91,8 @@ class UserView(APIView):
     """
     @type_check(["Company"])
     def get(self, request):
-        users = User.objects.all()
+        type = request.query_params.get('type', None)
+        users = User.objects.filter(type=type)
         users = UserSerializer(users, many=True)
         return Response(users.data)
 

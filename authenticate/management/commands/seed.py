@@ -3,6 +3,9 @@ from authenticate.models import User
 from insured.models import Insured
 from super_holder.models import SuperHolder
 from insurance.models import Insurance
+from ticket.models import Ticket
+from payment.models import InsuranceConnector
+from ticket.models import Claim
 
 
 class Command(BaseCommand):
@@ -60,6 +63,65 @@ class Command(BaseCommand):
         except:
             self.stdout.write("Insurance already created")
 
+        Insurance.objects.create(
+            name="4بیمه شخص ثالث", description="پرداخت هزینه های مربوط به تصادفات و خسارات ناشی از سوانح", price=10000000,
+            register_form={"وضعیت تاهل": "مجرد",
+                           "حقوق": 684,
+                           "تعداد فرزندان": "0",
+                           "زمان حادثه":"صبح",
+                           "نام بیماری": "ایدز"}, 
+                           claim_form={"مکان وقوع": "تهران",
+                                        "شهر محل زندگی": "Tehran",
+                                        "میزان": 8456,
+                                        "زمان": "1400/02/05"})
+        self.stdout.write("insurances created")
+
+    def create_tickets(self):
+        user = User.objects.get(username=1234567892)
+        Ticket.objects.create(user=user, name="مشکل در بیمه نامه",
+                              description="یک مشتری بعد از خرید بیمه نامه فورا دچار مشکل شده",)
+        user2 = User.objects.get(username=1234567893)
+        Ticket.objects.create(user=user2, name="عدم ثبت تخفیف هنگام خرید بیمه نامه",
+                              description="عدم ثبت بیمه نامه بعد از خرید لطفا سریعا پیگیری شود",)
+        user3 = User.objects.get(username=1234567895)
+        Ticket.objects.create(user=user2, name="چگونه بیمه جدید بخرم",
+                              description="برای خرید بیمه جدید ارور میگیرم لطفا راهنمایی کنید",)
+        self.stdout.write("tickets created")
+
+    def create_claims(self):
+        user = User.objects.get(username=1234567895)
+        insurance = Insurance.objects.get(id=10)
+        ins = InsuranceConnector.objects.create(user=user,insurance=insurance,)
+        Claim.objects.create(user=user, insurance=ins, 
+        title="جراحی قلب باز", 
+        description="من جراحی قلب باز انجام داده ام", 
+        status="Opened", 
+        
+        claim_form={"مکان وقوع": "تهران",
+                        "شهر محل زندگی": "Tehran",
+                        "میزان": 55000,
+                        "زمان": "1400/02/05"})
+        Claim.objects.create(user=user, insurance=ins, 
+        title="هزینه داروی خاص", 
+        description="داروی خاص خریداری شده برای بیماری", 
+        status="Opened", 
+       
+        claim_form={"مکان وقوع": "تهران",
+                        "شهر محل زندگی": "Tehran",
+                        "میزان": 25000,
+                        "زمان": "1400/02/20"})
+        self.stdout.write("claims created")
     def handle(self, *args, **kwargs):
-        self.create_users()
-        self.create_insurance()
+        try:
+            self.create_users()
+        except:
+              self.stdout.write("Users have already been created")
+        try:
+            self.create_insurances()
+        except:
+            self.stdout.write("Insurances have already been created")
+        try:
+            self.create_claims()
+        except:
+            self.stdout.write("Users have already been created")
+        self.create_tickets()
