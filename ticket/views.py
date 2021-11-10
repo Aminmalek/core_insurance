@@ -53,13 +53,6 @@ class TicketView(APIView):
             return Response({"message": "Ticket updated successfuly"}, status=status.HTTP_200_OK)
         else:
             return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
-        '''
-        Company = 1
-        Vendor = 2
-        SuperHolder = 3
-        Holder = 4
-        Insured = 5
-        '''
 
 
 class ClaimView(APIView):
@@ -102,7 +95,7 @@ class ClaimView(APIView):
                 coverage=coverage, claimed_amount=claimed_amount, claim_date=claim_date)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
-        elif user.type == 1 or  user.type == 1:
+        elif user.type == 1 or  user.type == 6:
             username = data['username']
             insurance = data['insurance_id']
             description = data['description']
@@ -134,25 +127,37 @@ class ClaimView(APIView):
             specefic_name = data['specefic_name']
             coverage = data['coverage']
             insurance = InsuranceConnector.objects.get(id=insurance)
-            reviewer = User.objects.get(username=reviewer)
-            vendor = User.objects.get(username=vendor)
             claim = Claim.objects.get(id=id)
-            claim.response = response
-            claim.status = claim_status
-            claim.reviewer = reviewer
-            claim.insurance = insurance
-            claim.franchise = franchise
-            claim.tariff = tariff
-            claim.payable_amount = payable_amount
-            claim.deductions = deductions
-            claim.vendor = vendor
-            claim.specefic_name = specefic_name
-            claim.coverage = coverage
+            if reviewer:
+                reviewer = User.objects.get(username=reviewer)
+                claim.reviewer = reviewer
+            if vendor:
+                vendor = User.objects.get(username=vendor)
+                claim.vendor = vendor
+            if response:
+                claim.response = response
+            if claim_status:
+                claim.status = claim_status
+            if insurance:
+                claim.insurance = insurance
+            if franchise:
+                claim.franchise = franchise
+            if tariff:
+                claim.tariff = tariff
+            if payable_amount:
+                claim.payable_amount = payable_amount
+            if deductions:
+                claim.deductions = deductions
+            if specefic_name:
+                claim.specefic_name = specefic_name
+            if coverage:
+                claim.coverage = coverage
             claim.save()
             return Response({"message": "Claim updated successfuly"}, status=status.HTTP_200_OK)
+
         if user.type == 5 or user.type == 4 or user.type == 3:
             claim = Claim.objects.get(id=id)
-            if claim.status == 'Opend':
+            if claim.status == 'Opened':
                 title = data['title']
                 claim_form = data['claim_form']
                 insurance_id = data['insurance']

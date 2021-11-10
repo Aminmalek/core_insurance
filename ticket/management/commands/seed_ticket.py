@@ -24,12 +24,13 @@ class Command(BaseCommand):
 
     def create_claims(self):
         user = User.objects.get(username=1234567895)
-        insurance = Insurance.objects.get(id=5)
+        insurance = Insurance.objects.get(id=10)
         ins = InsuranceConnector.objects.create(user=user,insurance=insurance,)
         Claim.objects.create(user=user, insurance=ins, 
         title="جراحی قلب باز", 
         description="من جراحی قلب باز انجام داده ام", 
         status="Opened", 
+        
         claim_form={"مکان وقوع": "تهران",
                         "شهر محل زندگی": "Tehran",
                         "میزان": 55000,
@@ -38,6 +39,7 @@ class Command(BaseCommand):
         title="هزینه داروی خاص", 
         description="داروی خاص خریداری شده برای بیماری", 
         status="Opened", 
+       
         claim_form={"مکان وقوع": "تهران",
                         "شهر محل زندگی": "Tehran",
                         "میزان": 25000,

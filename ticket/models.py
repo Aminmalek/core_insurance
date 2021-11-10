@@ -42,7 +42,7 @@ class Claim(models.Model):
     claim_form = models.JSONField()
     is_archived = models.BooleanField(default=False)
     reviewer = models.ForeignKey(
-        User, on_delete=models.PROTECT, null=True, blank=True,related_name="reviewer")
+        User, on_delete=models.PROTECT, null=True,related_name="reviewer")
     franchise = models.IntegerField(null=True)
     tarrif = models.IntegerField(null=True)
     payable_amount = models.IntegerField(null=True)
