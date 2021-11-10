@@ -1,3 +1,5 @@
+import re
+import json
 from rest_framework import status
 from rest_framework import response
 from rest_framework.response import Response
@@ -8,8 +10,10 @@ from payment.models import InsuranceConnector
 from . models import Ticket, Claim
 from . serializers import TicketSerializer, ClaimSerializer
 from Core.decorators import type_check
+from Health_Insurance.settings import BASE_DIR
 
 
+from rest_framework import permissions
 class TicketView(APIView):
 
     @type_check(["Company", "Holder", "SuperHolder", "Insured"])
@@ -195,3 +199,19 @@ class ClaimView(APIView):
             return Response({"message": "Claim archived successfuly"}, status=status.HTTP_200_OK)
         else:
             return Response({"message": "you can only delete your claims"}, status=status.HTTP_403_FORBIDDEN)
+
+
+
+class DataVendorView(APIView):
+
+    @type_check(["Vendor","Company"])
+    def get(self,request):
+        searched_name = request.query_params.get('name', None)
+        with open(BASE_DIR / 'data' / 'data.json', encoding='utf-8-sig') as file:
+            data = json.load(file)
+            user_needed_rows = []
+            for row in data:
+                regx = re.search(str(searched_name), str(row))
+                if regx:
+                    user_needed_rows.append(row)
+        return Response(user_needed_rows)
