@@ -9,4 +9,4 @@ class InsuredSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Insured
-        fields = ['id', 'user', 'supported_insureds']
+        fields = '__all__'

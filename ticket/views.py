@@ -1,22 +1,21 @@
 import re
 import json
 from rest_framework import status
-from rest_framework import response
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import pagination
 from authenticate.models import User
-
 from payment.models import InsuranceConnector
 from . models import Ticket, Claim
 from . serializers import TicketSerializer, ClaimSerializer
 from Core.decorators import type_check
 from Health_Insurance.settings import BASE_DIR
+from .models import ReviewerTimeline
 
 
-from rest_framework import permissions
 class TicketView(APIView):
 
-    @type_check(["Company", "Holder", "SuperHolder", "Insured"])
+    @type_check(["Company", "Holder", "SuperHolder", "Insured", ])
     def get(self, request):
         user = request.user
         if user.type == 5 or user.type == 4 or user.type == 3 or user.type == 2:
@@ -28,7 +27,7 @@ class TicketView(APIView):
         serializer = TicketSerializer(tickets, many=True)
         return Response(serializer.data)
 
-    @type_check(["Holder", "SuperHolder", "Insured"])
+    @type_check(["Company", "Holder", "SuperHolder", "Insured", "Vendor"])
     def post(self, request):
         data = request.data
         user = request.user
@@ -94,12 +93,13 @@ class ClaimView(APIView):
             claimed_amount = data['claimed_amount']
             claim_date = data['claim_date']
             insurance = InsuranceConnector.objects.get(id=insurance)
-            Claim.objects.create(
+            claim = Claim.objects.create(
                 user=user, title=title, insurance=insurance, status='Opened', claim_form=claim_form, description=description,
-                coverage=coverage, claimed_amount=claimed_amount, claim_date=claim_date)
+                claimed_amount=claimed_amount, claim_date=claim_date)
+            claim.coverage.add(coverage)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
-        elif user.type == 1 or  user.type == 6:
+        elif user.type == 1 or user.type == 6:
             username = data['username']
             insurance = data['insurance_id']
             description = data['description']
@@ -109,12 +109,13 @@ class ClaimView(APIView):
             claim_date = data['claim_date']
             user = User.objects.get(username=username)
             insurance = InsuranceConnector.objects.get(id=insurance)
-            Claim.objects.create(
+            claim = Claim.objects.create(
                 user=user, insurance=insurance, status='Opened', claim_form=claim_form,
-                description=description, coverage=coverage, claimed_amount=claimed_amount, claim_date=claim_date)
+                description=description, claimed_amount=claimed_amount, claim_date=claim_date)
+            claim.coverage.add(coverage)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
-    @type_check(["Company", "Holder", "Insured", "SuperHolder",'CompanyAdmin'])
+    @type_check(["Company", "Holder", "Insured", "SuperHolder", 'CompanyAdmin'])
     def put(self, request, id):
         data = request.data
         user = request.user
@@ -135,6 +136,8 @@ class ClaimView(APIView):
             if reviewer:
                 reviewer = User.objects.get(username=reviewer)
                 claim.reviewer = reviewer
+                ReviewerTimeline.objects.create(
+                    changed_by=user, reviewer=reviewer)
             if vendor:
                 vendor = User.objects.get(username=vendor)
                 claim.vendor = vendor
@@ -155,7 +158,7 @@ class ClaimView(APIView):
             if specefic_name:
                 claim.specefic_name = specefic_name
             if coverage:
-                claim.coverage = coverage
+                claim.coverage.add(coverage)
             claim.save()
             return Response({"message": "Claim updated successfuly"}, status=status.HTTP_200_OK)
 
@@ -179,7 +182,8 @@ class ClaimView(APIView):
                 if description:
                     claim.description = description
                 if coverage:
-                    claim.coverage = coverage
+                    claim.coverage.add(coverage)
+
                 if claimed_amount:
                     claim.claimed_amount = claimed_amount
                 if claim_date:
@@ -201,11 +205,10 @@ class ClaimView(APIView):
             return Response({"message": "you can only delete your claims"}, status=status.HTTP_403_FORBIDDEN)
 
 
-
 class DataVendorView(APIView):
 
-    @type_check(["Vendor","Company"])
-    def get(self,request):
+    @type_check(["Vendor", "Company"])
+    def get(self, request):
         searched_name = request.query_params.get('name', None)
         with open(BASE_DIR / 'data' / 'data.json', encoding='utf-8-sig') as file:
             data = json.load(file)
