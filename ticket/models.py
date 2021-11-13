@@ -1,9 +1,8 @@
 from django.db import models
-from django.db.models.fields import CharField
 from authenticate.models import User
 from payment.models import InsuranceConnector
 from insurance.models import Coverage
-
+from django.utils import timezone
 
 CLAIM_STATUS_CHOICES = (
     ('Opened', 'Opened'),
@@ -33,7 +32,7 @@ class Ticket(models.Model):
 
 
 class ReviewerTimeline(models.Model):
-    data = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(default=timezone.now)
     changed_by = models.ForeignKey(
         User, on_delete=models.PROTECT, null=True, blank=True)
     reviewer = models.ForeignKey(
@@ -64,6 +63,8 @@ class Claim(models.Model):
     specefic_name = models.CharField(max_length=50)
     coverage = models.ManyToManyField(
         Coverage, blank=True, related_name="claim_coverage")
+    reviewer_timeline = models.ManyToManyField(
+        ReviewerTimeline, blank=True, related_name="claim_reviewer_time_line_claim")
 
     def __str__(self):
         return self.title

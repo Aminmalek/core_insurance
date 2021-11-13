@@ -135,9 +135,11 @@ class ClaimView(APIView):
             claim = Claim.objects.get(id=id)
             if reviewer:
                 reviewer = User.objects.get(username=reviewer)
-                claim.reviewer = reviewer
-                ReviewerTimeline.objects.create(
+                
+                timeline = ReviewerTimeline.objects.create(
                     changed_by=user, reviewer=reviewer)
+                claim.reviewer = reviewer
+                claim.reviewer_timeline.add(timeline)
             if vendor:
                 vendor = User.objects.get(username=vendor)
                 claim.vendor = vendor
@@ -183,7 +185,6 @@ class ClaimView(APIView):
                     claim.description = description
                 if coverage:
                     claim.coverage.add(coverage)
-
                 if claimed_amount:
                     claim.claimed_amount = claimed_amount
                 if claim_date:
@@ -206,7 +207,9 @@ class ClaimView(APIView):
 
 
 class DataVendorView(APIView):
-
+    """
+        For search in a medical json file
+    """
     @type_check(["Vendor", "Company"])
     def get(self, request):
         searched_name = request.query_params.get('name', None)
