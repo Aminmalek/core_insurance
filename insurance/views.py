@@ -20,6 +20,7 @@ class InsuranceView(APIView):
                 i['id'] = str(uuid.uuid4())
         return obj
 
+    @type_check(["Company",])
     def get(self, request, id=None):
         if id:
             try:
@@ -42,13 +43,13 @@ class InsuranceView(APIView):
             description = data['description']
             price = data['price']
             register_form = self.guid_generator(data['register_form'])
-            claim_form = self.guid_generator(data['claim_form'])
+            
 
             if Insurance.objects.filter(name=name).exists():
                 return Response({"message": "insurance already exist"}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 Insurance.objects.create(
-                    name=name, description=description, price=price, register_form=register_form, claim_form=claim_form)
+                    name=name, description=description, price=price, register_form=register_form)
             return Response({"message": "insurance created successfuly"}, status=status.HTTP_201_CREATED)
  
     @type_check(["Company",])

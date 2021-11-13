@@ -134,11 +134,10 @@ class ClaimView(APIView):
             insurance = InsuranceConnector.objects.get(id=insurance)
             claim = Claim.objects.get(id=id)
             if reviewer:
-                reviewer = User.objects.get(username=reviewer)
-                
+                reviewer_user = User.objects.get(username=reviewer)
                 timeline = ReviewerTimeline.objects.create(
-                    changed_by=user, reviewer=reviewer)
-                claim.reviewer = reviewer
+                    changed_by=user, reviewer=reviewer_user)
+                claim.reviewer = reviewer_user
                 claim.reviewer_timeline.add(timeline)
             if vendor:
                 vendor = User.objects.get(username=vendor)
