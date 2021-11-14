@@ -17,13 +17,13 @@ class InsuredView(APIView):
             insureds = Insured.objects.all()
             serializer = InsuredSerializer(insureds, many=True)
             return Response(serializer.data)
-        else : 
-            user.type == 5 or user.type == 4
+        
+        elif user.type == 5 or user.type == 4:
             insured, created = Insured.objects.get_or_create(user=user)
             serializer = InsuredSerializer(insured)
             return Response(serializer.data)
 
-    @type_check(["Holder"])
+    @type_check(["SuperHolder","Holder"])
     def post(self, request):
         data = request.data
         user = request.user
@@ -57,6 +57,7 @@ class InsuredView(APIView):
                 insured.supported_insureds.add(user)
             return Response({"message": "insured created successfuly"}, status=status.HTTP_201_CREATED)
             
+    @type_check(["SuperHolder","Holder"])        
     def put(self, request, id):
         data = request.data
         user = request.user
@@ -68,7 +69,7 @@ class InsuredView(APIView):
         insured.save()
         return Response({"message": "insured updated successfuly"})
         
-    @type_check(["Company","Holder"])
+    @type_check(["Company","Holder","SuperHolder"])
     def delete(self, request, id):
         user = request.user
         user_id = User.objects.get(id=id)

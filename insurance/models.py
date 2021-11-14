@@ -4,9 +4,9 @@ from django.db.models.fields import IntegerField
 # price field most change
 
 class Coverage(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=100)
     claim_form = models.JSONField(null=True)
-    capacity = IntegerField()
+    capacity = IntegerField(null=True)
 
     def __str__(self):
         return self.name

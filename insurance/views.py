@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from .models import Insurance
+from .models import Insurance, Coverage
 from .serializers import InsuranceSerializer
 from Core.decorators import type_check
 import json
@@ -20,7 +20,7 @@ class InsuranceView(APIView):
                 i['id'] = str(uuid.uuid4())
         return obj
 
-    @type_check(["Company",])
+    @type_check(("Company", "Holder", "Insured", "SuperHolder", 'CompanyAdmin',))
     def get(self, request, id=None):
         if id:
             try:
@@ -34,7 +34,7 @@ class InsuranceView(APIView):
             serializer = InsuranceSerializer(insurance, many=True)
             return Response(serializer.data)
 
-    @type_check(["Company",])
+    @type_check(["Company", "CompanyAdmin"])
     def post(self, request):
         data = request.data
         user = request.user
@@ -42,33 +42,38 @@ class InsuranceView(APIView):
             name = data['name']
             description = data['description']
             price = data['price']
+            coverage = json.loads((data['coverage']))
             register_form = self.guid_generator(data['register_form'])
-            
-
             if Insurance.objects.filter(name=name).exists():
                 return Response({"message": "insurance already exist"}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                Insurance.objects.create(
+                insurance = Insurance.objects.create(
                     name=name, description=description, price=price, register_form=register_form)
+
+            for objects in coverage:
+                cover = Coverage.objects.create(
+                    name=objects['name'], claim_form=objects['claim_form'], capacity=objects['capacity'])
+                insurance.coverage.add(cover)
+
             return Response({"message": "insurance created successfuly"}, status=status.HTTP_201_CREATED)
- 
-    @type_check(["Company",])
+
+    @type_check(["Company", "CompanyAdmin"])
     def put(self, request, id):
         data = request.data
         name = data['name']
         description = data['description']
         price = data['price']
         register_form = self.guid_generator(data['register_form'])
-        claim_form = self.guid_generator(data['claim_form'])
+
         insurance = Insurance.objects.filter(id=id)
         if insurance:
             insurance.update(
-                name=name, description=description, price=price, register_form=register_form, claim_form=claim_form)
+                name=name, description=description, price=price, register_form=register_form)
             return Response({"message": "insurance updated successfuly"}, status=status.HTTP_202_ACCEPTED)
         else:
             return Response({"message": "insurance doesn't exist"}, status=status.HTTP_400_BAD_REQUEST)
 
-    @type_check(["Company",])
+    @type_check(["Company", "CompanyAdmin"])
     def delete(self, request, id):
         insurance = Insurance.objects.filter(id=id)
         if insurance:
