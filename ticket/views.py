@@ -1,18 +1,20 @@
+import re
+import json
 from rest_framework import status
-from rest_framework import response
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from authenticate.models import User
-
 from payment.models import InsuranceConnector
 from . models import Ticket, Claim
 from . serializers import TicketSerializer, ClaimSerializer
 from Core.decorators import type_check
-
+from Health_Insurance.settings import BASE_DIR
+from .models import ReviewerTimeline
+from insurance.models import Coverage
 
 class TicketView(APIView):
 
-    @type_check(["Company", "Holder", "SuperHolder", "Insured"])
+    @type_check(["Company", "Holder", "SuperHolder", "Insured", ])
     def get(self, request):
         user = request.user
         if user.type == 5 or user.type == 4 or user.type == 3 or user.type == 2:
@@ -24,7 +26,7 @@ class TicketView(APIView):
         serializer = TicketSerializer(tickets, many=True)
         return Response(serializer.data)
 
-    @type_check(["Holder", "SuperHolder", "Insured"])
+    @type_check(["Company", "Holder", "SuperHolder", "Insured", "Vendor"])
     def post(self, request):
         data = request.data
         user = request.user
@@ -86,31 +88,40 @@ class ClaimView(APIView):
             insurance = data['insurance_id']
             claim_form = data['claim_form']
             description = data['description']
-            coverage = data['coverage']
             claimed_amount = data['claimed_amount']
             claim_date = data['claim_date']
+            coverage = json.loads((data['coverage']))
             insurance = InsuranceConnector.objects.get(id=insurance)
-            Claim.objects.create(
+            claim = Claim.objects.create(
                 user=user, title=title, insurance=insurance, status='Opened', claim_form=claim_form, description=description,
-                coverage=coverage, claimed_amount=claimed_amount, claim_date=claim_date)
+                claimed_amount=claimed_amount, claim_date=claim_date)
+            for objects in coverage:
+                cover = Coverage.objects.create(
+                    name=objects['name'], claim_form=objects['claim_form'], capacity=objects['capacity'])
+                claim.coverage.add(cover)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
-        elif user.type == 1 or  user.type == 6:
+        elif user.type == 1 or user.type == 6:
             username = data['username']
             insurance = data['insurance_id']
             description = data['description']
             claim_form = data['claim_form']
-            coverage = data['coverage']
+            coverage = json.loads((data['coverage']))
             claimed_amount = data['claimed_amount']
             claim_date = data['claim_date']
             user = User.objects.get(username=username)
             insurance = InsuranceConnector.objects.get(id=insurance)
-            Claim.objects.create(
+            claim = Claim.objects.create(
                 user=user, insurance=insurance, status='Opened', claim_form=claim_form,
-                description=description, coverage=coverage, claimed_amount=claimed_amount, claim_date=claim_date)
+                description=description, claimed_amount=claimed_amount, claim_date=claim_date)
+            for objects in coverage:
+                cover = Coverage.objects.create(
+                    name=objects['name'], claim_form=objects['claim_form'], capacity=objects['capacity'])
+                claim.coverage.add(cover)
+
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
-    @type_check(["Company", "Holder", "Insured", "SuperHolder",'CompanyAdmin'])
+    @type_check(["Company", "Holder", "Insured", "SuperHolder", 'CompanyAdmin'])
     def put(self, request, id):
         data = request.data
         user = request.user
@@ -129,8 +140,11 @@ class ClaimView(APIView):
             insurance = InsuranceConnector.objects.get(id=insurance)
             claim = Claim.objects.get(id=id)
             if reviewer:
-                reviewer = User.objects.get(username=reviewer)
-                claim.reviewer = reviewer
+                reviewer_user = User.objects.get(username=reviewer)
+                timeline = ReviewerTimeline.objects.create(
+                    changed_by=user, reviewer=reviewer_user)
+                claim.reviewer = reviewer_user
+                claim.reviewer_timeline.add(timeline)
             if vendor:
                 vendor = User.objects.get(username=vendor)
                 claim.vendor = vendor
@@ -151,7 +165,7 @@ class ClaimView(APIView):
             if specefic_name:
                 claim.specefic_name = specefic_name
             if coverage:
-                claim.coverage = coverage
+                claim.coverage.add(coverage)
             claim.save()
             return Response({"message": "Claim updated successfuly"}, status=status.HTTP_200_OK)
 
@@ -175,7 +189,7 @@ class ClaimView(APIView):
                 if description:
                     claim.description = description
                 if coverage:
-                    claim.coverage = coverage
+                    claim.coverage.add(coverage)
                 if claimed_amount:
                     claim.claimed_amount = claimed_amount
                 if claim_date:
@@ -195,3 +209,20 @@ class ClaimView(APIView):
             return Response({"message": "Claim archived successfuly"}, status=status.HTTP_200_OK)
         else:
             return Response({"message": "you can only delete your claims"}, status=status.HTTP_403_FORBIDDEN)
+
+
+class DataVendorView(APIView):
+    """
+        For search in a medical json file
+    """
+    @type_check(["Vendor", "Company"])
+    def get(self, request):
+        searched_name = request.query_params.get('name', None)
+        with open(BASE_DIR / 'data' / 'data.json', encoding='utf-8-sig') as file:
+            data = json.load(file)
+            user_needed_rows = []
+            for row in data:
+                regx = re.search(str(searched_name), str(row))
+                if regx:
+                    user_needed_rows.append(row)
+        return Response(user_needed_rows)

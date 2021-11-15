@@ -92,8 +92,12 @@ class UserView(APIView):
     @type_check(["Company"])
     def get(self, request):
         type = request.query_params.get('type', None)
-        users = User.objects.filter(type=type)
+        if type:
+            users = User.objects.filter(type=type)
+        else:
+            users = User.objects.all()
         users = UserSerializer(users, many=True)
+
         return Response(users.data)
 
     @type_check(["Company"])
@@ -114,13 +118,12 @@ class FinancialManagementView(APIView):
     """
         adding money to users wallet and can see it by that user
     """
-    @type_check(["Holder","SuperHolder","Insured"])
+    @type_check(["Holder", "SuperHolder", "Insured"])
     def get(self, request):
         user = request.user
         return Response(user.cash)
 
-    
-    @type_check(["Holder","SuperHolder","Insured"])
+    @type_check(["Holder", "SuperHolder", "Insured"])
     def put(self, request):
         user = request.user
         data = request.data
@@ -128,4 +131,3 @@ class FinancialManagementView(APIView):
         user.cash = int(cash) + user.cash
         user.save()
         return Response({"message": "user cash updated successfully"})
-

@@ -1,7 +1,8 @@
 from django.db import models
-from django.db.models.fields import CharField
 from authenticate.models import User
 from payment.models import InsuranceConnector
+from insurance.models import Coverage
+from django.utils import timezone
 
 CLAIM_STATUS_CHOICES = (
     ('Opened', 'Opened'),
@@ -30,6 +31,14 @@ class Ticket(models.Model):
         return self.name
 
 
+class ReviewerTimeline(models.Model):
+    date = models.DateTimeField(default=timezone.now)
+    changed_by = models.ForeignKey(
+        User, on_delete=models.PROTECT, null=True, blank=True)
+    reviewer = models.ForeignKey(
+        User, on_delete=models.PROTECT, null=True, related_name="reviewer")
+
+
 class Claim(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.PROTECT, null=True, blank=True)
@@ -42,17 +51,20 @@ class Claim(models.Model):
     claim_form = models.JSONField()
     is_archived = models.BooleanField(default=False)
     reviewer = models.ForeignKey(
-        User, on_delete=models.PROTECT, null=True,related_name="reviewer")
+        User, on_delete=models.PROTECT, null=True, blank=True, related_name="claim_reviewer")
     franchise = models.IntegerField(null=True)
     tarrif = models.IntegerField(null=True)
     payable_amount = models.IntegerField(null=True)
     deducations = models.IntegerField(null=True)
     vendor = models.ForeignKey(
-        User, on_delete=models.PROTECT, null=True, blank=True,related_name="vendor")
+        User, on_delete=models.PROTECT, null=True, blank=True, related_name="vendor")
     claimed_amount = models.IntegerField(null=True)
     claim_date = models.DateTimeField(null=True)
     specefic_name = models.CharField(max_length=50)
-    coverage = models.CharField(max_length=40)
+    coverage = models.ManyToManyField(
+        Coverage, blank=True, related_name="claim_coverage")
+    reviewer_timeline = models.ManyToManyField(
+        ReviewerTimeline, blank=True, related_name="claim_reviewer_time_line_claim")
 
     def __str__(self):
         return self.title

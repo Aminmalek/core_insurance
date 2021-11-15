@@ -12,7 +12,7 @@ from Core.decorators import type_check
 
 class InsuranceConnectorView(APIView):
 
-    @type_check(["Company","Holder","SuperHolder","Insured"])
+    @type_check(("Company","Holder","SuperHolder","Insured"))
     def get(self, request):
         user = request.user
         if user.type == 1:
@@ -36,7 +36,7 @@ class InsuranceConnectorView(APIView):
         else:
             return Response({"error": "somne thing went wrong"},status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @type_check(["Holder","Insured"])
+    @type_check(("Holder","Insured","SuperHolder"))
     def post(self, request):
         data = request.data
         user = request.user
@@ -54,7 +54,7 @@ class InsuranceConnectorView(APIView):
             return Response({"error": "you have not enough money to buy insurance"}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message": "insurance purchased successfuly"}, status=status.HTTP_201_CREATED)
 
-    @type_check(["Company"])
+    @type_check(["Holder","Insured","SuperHolder"])
     def put(self, request, id):
         data = request.data
         insurance_connector = InsuranceConnector.objects.get(id=id)
@@ -65,3 +65,5 @@ class InsuranceConnectorView(APIView):
             return Response({"error": "please enter correct data"}, status=status.HTTP_400_BAD_REQUEST)
         insurance_connector.save()
         return Response({"message": "insurance connector updated successfuly"})
+
+
