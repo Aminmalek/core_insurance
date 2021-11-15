@@ -10,7 +10,7 @@ from . serializers import TicketSerializer, ClaimSerializer
 from Core.decorators import type_check
 from Health_Insurance.settings import BASE_DIR
 from .models import ReviewerTimeline
-
+from insurance.models import Coverage
 
 class TicketView(APIView):
 
@@ -88,14 +88,17 @@ class ClaimView(APIView):
             insurance = data['insurance_id']
             claim_form = data['claim_form']
             description = data['description']
-            coverage = data['coverage']
             claimed_amount = data['claimed_amount']
             claim_date = data['claim_date']
+            coverage = json.loads((data['coverage']))
             insurance = InsuranceConnector.objects.get(id=insurance)
             claim = Claim.objects.create(
                 user=user, title=title, insurance=insurance, status='Opened', claim_form=claim_form, description=description,
                 claimed_amount=claimed_amount, claim_date=claim_date)
-            claim.coverage.add(coverage)
+            for objects in coverage:
+                cover = Coverage.objects.create(
+                    name=objects['name'], claim_form=objects['claim_form'], capacity=objects['capacity'])
+                claim.coverage.add(cover)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
         elif user.type == 1 or user.type == 6:
@@ -103,7 +106,7 @@ class ClaimView(APIView):
             insurance = data['insurance_id']
             description = data['description']
             claim_form = data['claim_form']
-            coverage = data['coverage']
+            coverage = json.loads((data['coverage']))
             claimed_amount = data['claimed_amount']
             claim_date = data['claim_date']
             user = User.objects.get(username=username)
@@ -111,7 +114,11 @@ class ClaimView(APIView):
             claim = Claim.objects.create(
                 user=user, insurance=insurance, status='Opened', claim_form=claim_form,
                 description=description, claimed_amount=claimed_amount, claim_date=claim_date)
-            claim.coverage.add(coverage)
+            for objects in coverage:
+                cover = Coverage.objects.create(
+                    name=objects['name'], claim_form=objects['claim_form'], capacity=objects['capacity'])
+                claim.coverage.add(cover)
+
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
     @type_check(["Company", "Holder", "Insured", "SuperHolder", 'CompanyAdmin'])
