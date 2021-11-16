@@ -4,7 +4,6 @@ from rest_framework import status
 from .models import Insurance, Coverage
 from .serializers import InsuranceSerializer
 from Core.decorators import type_check
-import json
 import uuid
 
 
@@ -13,11 +12,19 @@ class InsuranceView(APIView):
         This api is used to handle full crud operations on insurance
     """
 
-    def guid_generator(self, object):
+    def uuid_generator(self, object):
         
-        for i in object:
-            if 'id' not in i:
-                i['id'] = str(uuid.uuid4())
+        for item in object:
+            if 'id' not in item:
+                item['id'] = str(uuid.uuid4())
+        return object
+
+    def claim_form_uuid_generator(self, object):
+        
+        if 'id' not in object:
+            object.append({"id":str(uuid.uuid4())})
+        """if 'id' not in object:
+            object['id'] = str(uuid.uuid4())"""
         return object
 
     @type_check(("Company", "Holder", "Insured", "SuperHolder", 'CompanyAdmin',))
@@ -43,7 +50,8 @@ class InsuranceView(APIView):
             description = data['description']
             price = data['price']
             coverage = data['coverage']
-            register_form = self.guid_generator(data['register_form'])
+            register_form = self.uuid_generator(data['register_form'])
+
             if Insurance.objects.filter(name=name).exists():
                 return Response({"message": "insurance already exist"}, status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -51,8 +59,9 @@ class InsuranceView(APIView):
                     name=name, description=description, price=price, register_form=register_form)
 
             for objects in coverage:
+                claim_form=self.claim_form_uuid_generator(objects["claim_form"])
                 cover = Coverage.objects.create(
-                    name=objects['name'], claim_form=objects['claim_form'], capacity=objects['capacity'])
+                    name=objects['name'],claim_form=claim_form , capacity=objects['capacity'])
                 insurance.coverage.add(cover)
 
             return Response({"message": "insurance created successfuly"}, status=status.HTTP_201_CREATED)
