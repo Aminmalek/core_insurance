@@ -94,14 +94,14 @@ class ClaimView(APIView):
         if user.type == 5 or user.type == 4 or user.type == 3:
             title = data['title']
             insurance = data['insurance_id']
-            claim_form = data['claim_form']
+            claims_form = data['claim_form']
             description = data['description']
             claimed_amount = data['claimed_amount']
             claim_date = data['claim_date']
             coverage = data['coverage']
             insurance = InsuranceConnector.objects.get(id=insurance)
             claim = Claim.objects.create(
-                user=user, title=title, insurance=insurance, status='Opened', claim_form=claim_form, description=description,
+                user=user, title=title, insurance=insurance, status='Opened', claim_form=claims_form, description=description,
                 claimed_amount=claimed_amount, claim_date=claim_date)
             for objects in coverage:
                 claim_form=self.claim_form_uuid_generator(objects["claim_form"])
@@ -114,14 +114,14 @@ class ClaimView(APIView):
             username = data['username']
             insurance = data['insurance_id']
             description = data['description']
-            claim_form = data['claim_form']
+            claims_form = data['claim_form']
             coverage = data['coverage']
             claimed_amount = data['claimed_amount']
             claim_date = data['claim_date']
             user = User.objects.get(username=username)
             insurance = InsuranceConnector.objects.get(id=insurance)
             claim = Claim.objects.create(
-                user=user, insurance=insurance, status='Opened', claim_form=claim_form,
+                user=user, insurance=insurance, status='Opened', claim_form=claims_form,
                 description=description, claimed_amount=claimed_amount, claim_date=claim_date)
             for objects in coverage:
                 claim_form=self.claim_form_uuid_generator(objects["claim_form"])
@@ -188,7 +188,7 @@ class ClaimView(APIView):
             claim = Claim.objects.get(id=id)
             if claim.status == 'Opened':
                 title = data['title']
-                claim_form = data['claim_form']
+                claims_form = data['claim_form']
                 insurance_id = data['insurance']
                 description = data['description']
                 coverage = data['coverage']
@@ -199,8 +199,8 @@ class ClaimView(APIView):
                 if insurance_id:
                     insurance = InsuranceConnector.objects.get(id=insurance_id)
                     claim.insurance = insurance
-                if claim_form:
-                    claim.claim_form = claim_form
+                if claims_form:
+                    claim.claim_form = claims_form
                 if description:
                     claim.description = description
                 if coverage:
