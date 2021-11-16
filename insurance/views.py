@@ -21,10 +21,9 @@ class InsuranceView(APIView):
 
     def claim_form_uuid_generator(self, object):
         
-        if 'id' not in object:
-            object.append({"id":str(uuid.uuid4())})
-        """if 'id' not in object:
-            object['id'] = str(uuid.uuid4())"""
+        for item in object:
+            if 'id' not in item:
+                item['id'] = str(uuid.uuid4())
         return object
 
     @type_check(("Company", "Holder", "Insured", "SuperHolder", 'CompanyAdmin',))
@@ -72,16 +71,28 @@ class InsuranceView(APIView):
         name = data['name']
         description = data['description']
         price = data['price']
-        register_form = self.guid_generator(data['register_form'])
-
-        insurance = Insurance.objects.filter(id=id)
-        if insurance:
-            insurance.update(
-                name=name, description=description, price=price, register_form=register_form)
-            return Response({"message": "insurance updated successfuly"}, status=status.HTTP_202_ACCEPTED)
-        else:
-            return Response({"message": "insurance doesn't exist"}, status=status.HTTP_400_BAD_REQUEST)
-
+        coverage = data['coverage']
+        register_form = self.uuid_generator(data['register_form'])
+        try:
+            insurance = Insurance.objects.get(id=id)
+        except:
+            return Response({"error": "insurance didn't found"},status=status.HTTP_404_NOT_FOUND)
+        if coverage:
+            insurance.coverage.clear()
+            for objects in coverage:
+                    claim_form=self.claim_form_uuid_generator(objects["claim_form"])
+                    cover = Coverage.objects.create(
+                        name=objects['name'],claim_form=claim_form , capacity=objects['capacity'])
+                    insurance.coverage.add(cover)
+        if name:
+            insurance.name = name
+        if description:
+            insurance.description = description
+        if price:
+            insurance.price = price
+        insurance.save()
+        return Response({"message": "insurance updated successfuly"}, status=status.HTTP_202_ACCEPTED)
+        
     @type_check(["Company", "CompanyAdmin"])
     def delete(self, request, id):
         insurance = Insurance.objects.filter(id=id)

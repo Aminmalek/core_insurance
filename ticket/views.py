@@ -165,7 +165,12 @@ class ClaimView(APIView):
             if specefic_name:
                 claim.specefic_name = specefic_name
             if coverage:
-                claim.coverage.add(coverage)
+                insurance.coverage.clear()
+                for objects in coverage:
+                    claim_form=self.claim_form_uuid_generator(objects["claim_form"])
+                    cover = Coverage.objects.create(
+                        name=objects['name'],claim_form=claim_form , capacity=objects['capacity'])
+                    insurance.coverage.add(cover)
             claim.save()
             return Response({"message": "Claim updated successfuly"}, status=status.HTTP_200_OK)
 
