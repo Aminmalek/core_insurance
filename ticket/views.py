@@ -106,7 +106,7 @@ class ClaimView(APIView):
             insurance = data['insurance_id']
             description = data['description']
             claim_form = data['claim_form']
-            coverage = json.loads((data['coverage']))
+            coverage = data['coverage']
             claimed_amount = data['claimed_amount']
             claim_date = data['claim_date']
             user = User.objects.get(username=username)

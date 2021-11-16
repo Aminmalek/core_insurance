@@ -14,11 +14,11 @@ class InsuranceView(APIView):
     """
 
     def guid_generator(self, object):
-        obj = json.loads(object)
-        for i in obj:
+        
+        for i in object:
             if 'id' not in i:
                 i['id'] = str(uuid.uuid4())
-        return obj
+        return object
 
     @type_check(("Company", "Holder", "Insured", "SuperHolder", 'CompanyAdmin',))
     def get(self, request, id=None):
@@ -42,7 +42,7 @@ class InsuranceView(APIView):
             name = data['name']
             description = data['description']
             price = data['price']
-            coverage = json.loads((data['coverage']))
+            coverage = data['coverage']
             register_form = self.guid_generator(data['register_form'])
             if Insurance.objects.filter(name=name).exists():
                 return Response({"message": "insurance already exist"}, status=status.HTTP_400_BAD_REQUEST)
