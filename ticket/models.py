@@ -67,4 +67,4 @@ class Claim(models.Model):
         ReviewerTimeline, blank=True, related_name="claim_reviewer_time_line_claim")
 
     def __str__(self):
-        return self.id
+        return self.description

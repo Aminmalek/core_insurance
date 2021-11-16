@@ -1,5 +1,6 @@
 import re
 import json
+import uuid
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -58,6 +59,13 @@ class TicketView(APIView):
 
 
 class ClaimView(APIView):
+    
+    def claim_form_uuid_generator(self, object):
+        
+        for item in object:
+            if 'id' not in item:
+                item['id'] = str(uuid.uuid4())
+        return object
 
     @type_check(["Company", "Holder", "SuperHolder", "Insured", 'CompanyAdmin'])
     def get(self, request, id=None):
@@ -90,12 +98,13 @@ class ClaimView(APIView):
             description = data['description']
             claimed_amount = data['claimed_amount']
             claim_date = data['claim_date']
-            coverage = json.loads((data['coverage']))
+            coverage = data['coverage']
             insurance = InsuranceConnector.objects.get(id=insurance)
             claim = Claim.objects.create(
                 user=user, title=title, insurance=insurance, status='Opened', claim_form=claim_form, description=description,
                 claimed_amount=claimed_amount, claim_date=claim_date)
             for objects in coverage:
+                claim_form=self.claim_form_uuid_generator(objects["claim_form"])
                 cover = Coverage.objects.create(
                     name=objects['name'], claim_form=objects['claim_form'], capacity=objects['capacity'])
                 claim.coverage.add(cover)
@@ -115,6 +124,7 @@ class ClaimView(APIView):
                 user=user, insurance=insurance, status='Opened', claim_form=claim_form,
                 description=description, claimed_amount=claimed_amount, claim_date=claim_date)
             for objects in coverage:
+                claim_form=self.claim_form_uuid_generator(objects["claim_form"])
                 cover = Coverage.objects.create(
                     name=objects['name'], claim_form=objects['claim_form'], capacity=objects['capacity'])
                 claim.coverage.add(cover)
@@ -165,12 +175,12 @@ class ClaimView(APIView):
             if specefic_name:
                 claim.specefic_name = specefic_name
             if coverage:
-                insurance.coverage.clear()
+                claim.coverage.clear()
                 for objects in coverage:
                     claim_form=self.claim_form_uuid_generator(objects["claim_form"])
                     cover = Coverage.objects.create(
                         name=objects['name'],claim_form=claim_form , capacity=objects['capacity'])
-                    insurance.coverage.add(cover)
+                    claim.coverage.add(cover)
             claim.save()
             return Response({"message": "Claim updated successfuly"}, status=status.HTTP_200_OK)
 
@@ -194,7 +204,12 @@ class ClaimView(APIView):
                 if description:
                     claim.description = description
                 if coverage:
-                    claim.coverage.add(coverage)
+                    claim.coverage.clear()
+                    for objects in coverage:
+                        claim_form=self.claim_form_uuid_generator(objects["claim_form"])
+                        cover = Coverage.objects.create(
+                            name=objects['name'],claim_form=claim_form , capacity=objects['capacity'])
+                        claim.coverage.add(cover)
                 if claimed_amount:
                     claim.claimed_amount = claimed_amount
                 if claim_date:
