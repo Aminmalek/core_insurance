@@ -7,6 +7,7 @@ from django.urls import reverse
 from ticket.serializers import TicketSerializer
 from insurance.models import Insurance, Coverage
 
+
 class TicketsTests(APITestCase):
 
     def setUp(self):
@@ -86,12 +87,14 @@ class TicketsTests(APITestCase):
     def test_none_vendor_can_update_ticket(self):
         fake_user = User.objects.create(
         username=1, password="123456", type=1)
-        Ticket.objects.create(name="some ticket", user=fake_user,description="some thing")
+        Ticket.objects.create(name="some ticket",
+                              user=fake_user,description="some thing")
         self.new_token = Token.objects.create(user=fake_user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.new_token.key)
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Token ' + self.new_token.key)
         data = {"status":"true","ticket_id":1}
         response = self.client.put(self.url,data)
-        self.assertEqual(401,response.status_code) 
+        self.assertEqual(401,response.status_code)
 '''
 
 
@@ -136,19 +139,45 @@ class ClaimTests(APITestCase):
         self.assertEqual(200, response.status_code)
 
     def test_10_user_Insured_can_post_claims(self):
-        InsuranceConnector.objects.create(id=3,user=self.user,)
-        Coverage.objects.create(id=32,name="eyes",capacity=10)
-        data = {"title": "some insurance!",
+        InsuranceConnector.objects.create(id=3, user=self.user,)
+        data = {
+                "title": "some title",
                 "insurance_id": 3,
-                "description": "this is an insurance",
-                "claim_form": {"where": "Tehran",
-                               "wich city": "Tehran",
-                               "how much": 8456,
-                               "when": "1400/02/05"},
-                "coverage":32,
-                "claimed_amount":54,
-                "claim_date":"2021-11-13 22:00:00",
-                }
+                "description": "درخواست دریافت خسارت بیمه",
+                "claim_form": {
+                    "41467969-4d5a-4426-9c88-a27c407b2201": "2343",
+                    "c2266916-1cad-4f42-9068-682fb04ccdd5": "234234"
+                },
+
+                "claimed_amount": 600000,
+                "claim_date": "2021-12-11T12:12:00Z",
+                "coverage": [
+                    {
+                        "name": "دندان",
+                        "claim_form": [
+                            {
+                                "name": "sfdv",
+                                "type": "sdv"
+                            },
+                            {
+                                "name": "dv",
+                                "type": "dv"
+                            }
+                        ],
+                        "capacity": 100
+                    },
+                    {
+                        "name": "عمومی",
+                        "claim_form": [
+                            {
+                                "name": "test",
+                                "type": "fgyj"
+                            }
+                        ],
+                        "capacity": 150
+                    }
+                ]
+            }
 
 
         response = self.client.post(self.url, format='json', data=data)
@@ -162,18 +191,45 @@ class ClaimTests(APITestCase):
         self.client.credentials(
             HTTP_AUTHORIZATION='Token ' + self.new_token.key)
         InsuranceConnector.objects.create(id=2, user=self.user,)
-        Coverage.objects.create(id=55,name="eyes",capacity=10)
-        data = {"title": "some insurance!",
+        Coverage.objects.create(id=55, name="eyes", capacity=10)
+        data = {
+                "title": "some title",
                 "insurance_id": 2,
-                "description": "this is an insurance",
-                "claim_form": {"where": "Tehran",
-                               "wich city": "Tehran",
-                               "how much": 8456,
-                               "when": "1400/02/05"},
-                "coverage":55,
-                "claimed_amount":54,
-                "claim_date":"2021-12-5",
-                }
+                "description": "درخواست دریافت خسارت بیمه",
+                "claim_form": {
+                    "41467969-4d5a-4426-9c88-a27c407b2201": "2343",
+                    "c2266916-1cad-4f42-9068-682fb04ccdd5": "234234"
+                },
+
+                "claimed_amount": 600000,
+                "claim_date": "2021-12-11T12:12:00Z",
+                "coverage": [
+                    {
+                        "name": "دندان",
+                        "claim_form": [
+                            {
+                                "name": "sfdv",
+                                "type": "sdv"
+                            },
+                            {
+                                "name": "dv",
+                                "type": "dv"
+                            }
+                        ],
+                        "capacity": 100
+                    },
+                    {
+                        "name": "عمومی",
+                        "claim_form": [
+                            {
+                                "name": "test",
+                                "type": "fgyj"
+                            }
+                        ],
+                        "capacity": 150
+                    }
+                ]
+            }
 
         response = self.client.post(self.url, format='json', data=data)
         self.assertEqual(
@@ -244,7 +300,7 @@ class ClaimTests(APITestCase):
             HTTP_AUTHORIZATION='Token ' + self.new_token.key)
         InsuranceConnector.objects.create(id=2, user=self.user,)
         con = InsuranceConnector.objects.get(id=2)
-        Claim.objects.create(id=564, title="some insurance!",
+        Claim.objects.create(user=_user,id=564, title="some insurance!",
                              insurance=con,
                              description="this is an claim",
                              claim_form={"where": "Tehran",

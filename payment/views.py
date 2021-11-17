@@ -54,7 +54,7 @@ class InsuranceConnectorView(APIView):
             return Response({"error": "you have not enough money to buy insurance"}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message": "insurance purchased successfuly"}, status=status.HTTP_201_CREATED)
 
-    @type_check(["Holder","Insured","SuperHolder"])
+    @type_check(["Company","Holder","Insured","SuperHolder"])
     def put(self, request, id):
         data = request.data
         insurance_connector = InsuranceConnector.objects.get(id=id)

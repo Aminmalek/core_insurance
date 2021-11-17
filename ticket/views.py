@@ -13,6 +13,7 @@ from Health_Insurance.settings import BASE_DIR
 from .models import ReviewerTimeline
 from insurance.models import Coverage
 
+
 class TicketView(APIView):
 
     @type_check(["Company", "Holder", "SuperHolder", "Insured", ])
@@ -106,7 +107,7 @@ class ClaimView(APIView):
             for objects in coverage:
                 claim_form=self.claim_form_uuid_generator(objects["claim_form"])
                 cover = Coverage.objects.create(
-                    name=objects['name'], claim_form=objects['claim_form'], capacity=objects['capacity'])
+                    name=objects['name'], claim_form=claim_form, capacity=objects['capacity'])
                 claim.coverage.add(cover)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
@@ -126,7 +127,7 @@ class ClaimView(APIView):
             for objects in coverage:
                 claim_form=self.claim_form_uuid_generator(objects["claim_form"])
                 cover = Coverage.objects.create(
-                    name=objects['name'], claim_form=objects['claim_form'], capacity=objects['capacity'])
+                    name=objects['name'], claim_form=claim_form, capacity=objects['capacity'])
                 claim.coverage.add(cover)
 
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
@@ -185,7 +186,11 @@ class ClaimView(APIView):
             return Response({"message": "Claim updated successfuly"}, status=status.HTTP_200_OK)
 
         if user.type == 5 or user.type == 4 or user.type == 3:
+            
             claim = Claim.objects.get(id=id)
+            if user != claim.user:
+                return Response({"error": "user only can update his claims"}, status=status.HTTP_403_FORBIDDEN)
+                
             if claim.status == 'Opened':
                 title = data['title']
                 claims_form = data['claim_form']

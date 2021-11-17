@@ -6,8 +6,6 @@ from ticket.models import Ticket
 from django.urls import reverse
 from insurance.models import Insurance
 
-permissions_dic = {"Company": 1, "Vendor": 2,
-                               "SuperHolder": 3, "Holder": 4, "Insured": 5}
 
 class PaymentTests(APITestCase):
 
