@@ -59,7 +59,7 @@ class InsuranceView(APIView):
         if Insurance.objects.filter(id=id).exists():
             insurance = Insurance.objects.get(id=id)
             if name:
-                insurance.name 
+                insurance.name
             if description:
                 insurance.description = description
             if price:
@@ -77,10 +77,10 @@ class InsuranceView(APIView):
             return Response({"message": "insurance updated successfuly"}, status=status.HTTP_202_ACCEPTED)
         else:
             return Response({"error": "insurance doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
+
     @type_check(["Company", "CompanyAdmin"])
     def delete(self, request, id):
-        insurance = Insurance.objects.filter(id=id)
-        if insurance:
+        if Insurance.objects.filter(id=id).exists():
             Insurance.objects.get(id=id).delete()
             return Response({"message": "insurance deleted successfuly"}, status=status.HTTP_202_ACCEPTED)
         else:
