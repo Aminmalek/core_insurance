@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from insured.models import Insured
 from authenticate.models import User
-from Core.decorators import type_check
+from Core.decorators import type_check, type_confirmation
 from .serializers import InsuredSerializer
 
 
@@ -13,11 +13,11 @@ class InsuredView(APIView):
     def get(self, request):
         user = request.user
 
-        if user.type == 1:
+        if type_confirmation(user.type, ("Company",)):
             insureds = Insured.objects.all()
             serializer = InsuredSerializer(insureds, many=True)
             return Response(serializer.data)
-        elif user.type == 5 or user.type == 4:
+        elif type_confirmation(user.type, ("Holder", "Insured")):
             insured, created = Insured.objects.get_or_create(user=user)
             serializer = InsuredSerializer(insured)
             return Response(serializer.data)
@@ -58,8 +58,13 @@ class InsuredView(APIView):
     @type_check(("Company", "Holder"))
     def delete(self, request, id):
         user = request.user
-        if user.type == 1:
+        if type_confirmation(user.type, ("Company",)):
             Insured.objects.filter(user=id).delete()
             User.objects.filter(id=id).update(is_active=False)
+            return Response({"message": "insured deleted successfuly"})
         else:
-            pass
+            holder = Insured.objects.get(user=user)
+            insured_user = User.objects.get(id=id)
+            holder.supported_insureds.remove(insured_user)
+            User.objects.filter(id=id).update(is_active=False)
+            return Response({"message": "insured deleted successfuly"})

@@ -8,7 +8,7 @@ from authenticate.models import User
 from payment.models import InsuranceConnector
 from . models import Ticket, Claim
 from . serializers import TicketSerializer, ClaimSerializer
-from Core.decorators import type_check
+from Core.decorators import type_check, type_confirmation
 from Health_Insurance.settings import BASE_DIR
 from .models import ReviewerTimeline
 from insurance.models import Coverage
@@ -16,15 +16,13 @@ from insurance.models import Coverage
 
 class TicketView(APIView):
 
-    @type_check(["Company", "Holder", "SuperHolder", "Insured", ])
+    @type_check(["Company", "Holder", "SuperHolder", "Vendor", "Insured", ])
     def get(self, request):
         user = request.user
-        if user.type == 5 or user.type == 4 or user.type == 3 or user.type == 2:
+        if type_confirmation(user.type, ("Holder", "SuperHolder", "Insured", "Vendor")):
             tickets = Ticket.objects.filter(user=user)
-        elif user.type == 1:
+        elif type_confirmation(user.type, ("Company",)):
             tickets = Ticket.objects.all()
-        else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
         serializer = TicketSerializer(tickets, many=True)
         return Response(serializer.data)
 
@@ -32,46 +30,39 @@ class TicketView(APIView):
     def post(self, request):
         data = request.data
         user = request.user
-        if user.type == 5 or user.type == 4 or user.type == 3 or user.type == 2:
-            ticket_name = data['name']
-            description = data['description']
-            Ticket.objects.create(
-                user=user, name=ticket_name, status='Opened', description=description)
-            return Response({"message": "Ticket created successfuly"}, status=status.HTTP_200_OK)
-        else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
+        ticket_name = data['name']
+        description = data['description']
+        Ticket.objects.create(
+            user=user, name=ticket_name, status='Opened', description=description)
+        return Response({"message": "Ticket created successfuly"}, status=status.HTTP_200_OK)
 
     @type_check(["Company"])
     def put(self, request, id):
         data = request.data
-        user = request.user
-        if user.type == 1:
-            ticket = Ticket.objects.get(id=id)
-            ticket_status = data['status']
-            description = data['description']
-            if ticket_status:
-                ticket.status = ticket_status
-            if description:
-                ticket.description = description
-            ticket.save()
-            return Response({"message": "Ticket updated successfuly"}, status=status.HTTP_200_OK)
-        else:
-            return Response({"message": "you are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
+        ticket = Ticket.objects.get(id=id)
+        ticket_status = data['status']
+        description = data['description']
+        if ticket_status:
+            ticket.status = ticket_status
+        if description:
+            ticket.description = description
+        ticket.save()
+        return Response({"message": "Ticket updated successfuly"}, status=status.HTTP_200_OK)
 
 
 class ClaimView(APIView):
-    
+
     def claim_form_uuid_generator(self, object):
-        
+
         for item in object:
             if 'id' not in item:
                 item['id'] = str(uuid.uuid4())
         return object
 
-    @type_check(["Company", "Holder", "SuperHolder", "Insured", 'CompanyAdmin'])
+    @type_check(("Company", "Holder", "SuperHolder", "Insured", "CompanyAdmin"))
     def get(self, request, id=None):
         user = request.user
-        if user.type == 4 or user.type == 5 or user.type == 3:
+        if type_confirmation(user.type, ("Holder", "SuperHolder", "Insured")):
             if id:
                 claims = Claim.objects.get(id=id, user=user)
                 serializer = ClaimSerializer(claims)
@@ -79,7 +70,7 @@ class ClaimView(APIView):
                 claims = Claim.objects.filter(user=user)
                 serializer = ClaimSerializer(claims, many=True)
 
-        elif user.type == 1 or user.type == 6:
+        elif type_confirmation(user.type, ("Company", "CompanyAdmin")):
             if id:
                 claims = Claim.objects.get(id=id)
                 serializer = ClaimSerializer(claims)
@@ -92,7 +83,7 @@ class ClaimView(APIView):
     def post(self, request):
         data = request.data
         user = request.user
-        if user.type == 5 or user.type == 4 or user.type == 3:
+        if type_confirmation(user.type, ("Holder", "SuperHolder", "Insured")):
             title = data['title']
             insurance = data['insurance_id']
             claims_form = data['claim_form']
@@ -105,13 +96,14 @@ class ClaimView(APIView):
                 user=user, title=title, insurance=insurance, status='Opened', claim_form=claims_form, description=description,
                 claimed_amount=claimed_amount, claim_date=claim_date)
             for objects in coverage:
-                claim_form=self.claim_form_uuid_generator(objects["claim_form"])
+                claim_form = self.claim_form_uuid_generator(
+                    objects["claim_form"])
                 cover = Coverage.objects.create(
                     name=objects['name'], claim_form=claim_form, capacity=objects['capacity'])
                 claim.coverage.add(cover)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
-        elif user.type == 1 or user.type == 6:
+        elif type_confirmation(user.type, ("Company", "CompanyAdmin")):
             username = data['username']
             insurance = data['insurance_id']
             description = data['description']
@@ -125,7 +117,8 @@ class ClaimView(APIView):
                 user=user, insurance=insurance, status='Opened', claim_form=claims_form,
                 description=description, claimed_amount=claimed_amount, claim_date=claim_date)
             for objects in coverage:
-                claim_form=self.claim_form_uuid_generator(objects["claim_form"])
+                claim_form = self.claim_form_uuid_generator(
+                    objects["claim_form"])
                 cover = Coverage.objects.create(
                     name=objects['name'], claim_form=claim_form, capacity=objects['capacity'])
                 claim.coverage.add(cover)
@@ -136,7 +129,7 @@ class ClaimView(APIView):
     def put(self, request, id):
         data = request.data
         user = request.user
-        if user.type == 1 or user.type == 6:
+        if type_confirmation(user.type, ("Company", "CompanyAdmin")):
             response = data['response']
             claim_status = data['status']
             reviewer = data['reviewer']
@@ -178,19 +171,19 @@ class ClaimView(APIView):
             if coverage:
                 claim.coverage.clear()
                 for objects in coverage:
-                    claim_form=self.claim_form_uuid_generator(objects["claim_form"])
+                    claim_form = self.claim_form_uuid_generator(
+                        objects["claim_form"])
                     cover = Coverage.objects.create(
-                        name=objects['name'],claim_form=claim_form , capacity=objects['capacity'])
+                        name=objects['name'], claim_form=claim_form, capacity=objects['capacity'])
                     claim.coverage.add(cover)
             claim.save()
             return Response({"message": "Claim updated successfuly"}, status=status.HTTP_200_OK)
 
-        if user.type == 5 or user.type == 4 or user.type == 3:
-            
+        if type_confirmation(user.type, ("Holder", "SuperHolder", "Insured")):
             claim = Claim.objects.get(id=id)
             if user != claim.user:
                 return Response({"error": "user only can update his claims"}, status=status.HTTP_403_FORBIDDEN)
-                
+
             if claim.status == 'Opened':
                 title = data['title']
                 claims_form = data['claim_form']
@@ -211,9 +204,10 @@ class ClaimView(APIView):
                 if coverage:
                     claim.coverage.clear()
                     for objects in coverage:
-                        claim_form=self.claim_form_uuid_generator(objects["claim_form"])
+                        claim_form = self.claim_form_uuid_generator(
+                            objects["claim_form"])
                         cover = Coverage.objects.create(
-                            name=objects['name'],claim_form=claim_form , capacity=objects['capacity'])
+                            name=objects['name'], claim_form=claim_form, capacity=objects['capacity'])
                         claim.coverage.add(cover)
                 if claimed_amount:
                     claim.claimed_amount = claimed_amount
@@ -249,5 +243,5 @@ class DataVendorView(APIView):
             for row in data:
                 regx = re.search(str(searched_name), str(row))
                 if regx:
-                    user_needed_rows.append(row)
+                    user_needed_rows.append(row) 
         return Response(user_needed_rows)

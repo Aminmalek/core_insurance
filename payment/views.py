@@ -7,7 +7,7 @@ from payment.models import InsuranceConnector
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from Core.decorators import type_check
+from Core.decorators import type_check,type_confirmation
 
 
 class InsuranceConnectorView(APIView):
@@ -15,18 +15,18 @@ class InsuranceConnectorView(APIView):
     @type_check(("Company","Holder","SuperHolder","Insured"))
     def get(self, request):
         user = request.user
-        if user.type == 1:
+        if  type_confirmation(user.type, ("Company",)):
             insurance_connector = InsuranceConnector.objects.all()
             insurance_connector = InsuranceConnectorSerializer(
                 insurance_connector, many=True)
             return Response(insurance_connector.data)
-        elif user.type == 4 or user.type == 3:
+        elif type_confirmation(user.type, ("Holder","SuperHolder")):
             insurance_connector = InsuranceConnector.objects.filter(
                 user=user)
             insurance_connector = InsuranceConnectorSerializer(
                 insurance_connector, many=True)
             return Response(insurance_connector.data)
-        elif user.type == 5:
+        elif type_confirmation(user.type, ("Insured",)):
             parent = Insured.objects.get(supported_insureds=user)
             insurance_connector = InsuranceConnector.objects.filter(
                 user=parent.user)

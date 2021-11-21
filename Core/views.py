@@ -8,7 +8,7 @@ from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from Health_Insurance.settings import BASE_DIR
 from authenticate.models import User
-from .decorators import type_check
+from .decorators import type_check,type_confirmation
 from .models import Message
 from .serializers import MessageSerializer
 
@@ -93,3 +93,13 @@ class MessageView(APIView):
         else:
             return Response({"error": "you can only delete your messages"}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class TestView(APIView):
+   
+    def get(self, request):
+        user = request.user
+        if type_confirmation(user.type,("Vendor","Insured")):
+            return Response({"hello"})
+        else:
+            print(type_confirmation(user.type,("Company","Insured")))
+            return Response({"bye"})

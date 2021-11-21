@@ -6,24 +6,25 @@ from rest_framework import status
 from .models import SuperHolder
 from .serializers import SuperHolderSerializer
 from authenticate.models import User
-from Core.decorators import type_check
+from Core.decorators import type_check, type_confirmation
+
 
 class SuperHolderView(APIView):
 
-    @type_check(["Company","SuperHolder"])
+    @type_check(("Company", "SuperHolder"))
     def get(self, request):
         user = request.user
-        if user.type == 1:
+        if type_confirmation(user.type, ("Company",)):
             superholders = SuperHolder.objects.all()
             serializer = SuperHolderSerializer(superholders, many=True)
             return Response(serializer.data)
-        elif user.type == 3:
+        elif type_confirmation(user.type, ("SuperHolder",)):
             superholder, created = SuperHolder.objects.get_or_create(
                 user=user)
             serializer = SuperHolderSerializer(superholder)
             return Response(serializer.data)
-        
-    @type_check(["SuperHolder"])
+
+    @type_check(("SuperHolder",))
     def post(self, request):
         data = request.data
         username = data['username']
@@ -42,9 +43,9 @@ class SuperHolderView(APIView):
             user=request.user).supported_holders.add(user)
         return Response({"message": "holder created successfuly"}, status=status.HTTP_201_CREATED)
 
-    @type_check(["SuperHolder"])
+    @type_check(("SuperHolder",))
     def put(self, request):
-        
+
         data = request.data
         user = request.user
         supported_holders = data['supported_holders']
@@ -54,16 +55,16 @@ class SuperHolderView(APIView):
         super_holder.save()
         return Response({"message": "super holder updated successfuly"})
 
-    @type_check(["Company","SuperHolder",'Holder'])
+    @type_check(("Company", "SuperHolder", 'Holder'))
     def delete(self, request, id):
         user = request.user
-        if user.type == 1 or user.type == 3:
+        if type_confirmation(user.type, ("SuperHolder","Company")):
             insured_user = User.objects.get(id=id)
-            if insured_user.type == 4:
+            if type_confirmation(insured_user.type, ("Holder",)):
                 if Insured.objects.filter(user=insured_user).exists():
                     insured = Insured.objects.get(user=insured_user)
                     supported_holder = SuperHolder.objects.get(user=user)
-                    if user.type == 3:
+                    if type_confirmation(user.type, ("SuperHolder",)):
                         try:
                             supported_holder.supported_holders.remove(
                                 insured_user)
@@ -79,4 +80,3 @@ class SuperHolderView(APIView):
                     return Response({"message": "Holder does not exist"}, status=status.HTTP_404_NOT_FOUND)
             else:
                 return Response({"message": "you can only delete holders"}, status=status.HTTP_403_FORBIDDEN)
-    

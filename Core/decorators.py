@@ -19,7 +19,7 @@ def type_check(*permissions):
         @wraps(view)
         def decorated_function(self, request, *args, **kwargs):
             permissions_dic = {"Company": 1, "Vendor": 2,
-                               "SuperHolder": 3, "Holder": 4, "Insured": 5,"CompanyAdmin": 6}
+                               "SuperHolder": 3, "Holder": 4, "Insured": 5, "CompanyAdmin": 6}
             permission_num = []
 
             for per in permissions[0]:
@@ -31,3 +31,12 @@ def type_check(*permissions):
                 return view(self, request, *args, **kwargs)
         return decorated_function
     return decorator
+
+
+def type_confirmation(user_type, *required_type):
+    permissions_dic = {"Company": 1, "Vendor": 2,
+                       "SuperHolder": 3, "Holder": 4, "Insured": 5, "CompanyAdmin": 6}
+    permission_numbers = []
+    for per in required_type[0]:
+        permission_numbers.append(permissions_dic[per])
+    return True if user_type in permission_numbers else False

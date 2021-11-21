@@ -27,7 +27,7 @@ class SignupView(APIView):
             return Response({'error': 'Username or Phone number already exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
         else:
             user = User.objects.create_user(username=username, password=password, first_name=first_name,
-                                            last_name=last_name, phone=phone, type=1, bank_account_number=bank_account_number)
+                                            last_name=last_name, phone=phone, type=5, bank_account_number=bank_account_number)
             token = Token.objects.create(user=user)
             return Response({'token': token.key}, status=status.HTTP_201_CREATED)
 
