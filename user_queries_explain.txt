@@ -1,0 +1,26 @@
+Index Scan using authenticate_user_username_171aad7d_like on public.authenticate_user  (cost=0.14..8.16 rows=1 width=1857) (actual time=0.017..0.017 rows=0 loops=1)
+  Output: id, password, last_login, type, phone, bank_account_number, cash, email, date_joined, is_staff, is_superuser, username, first_name, last_name, is_active
+  Index Cond: ((authenticate_user.username)::text = '475274524752'::text)
+Planning Time: 0.123 ms
+Execution Time: 0.036 ms
+
+Seq Scan on public.authenticate_user  (cost=0.00..10.50 rows=1 width=1857) (actual time=0.026..0.027 rows=0 loops=1)
+  Output: id, password, last_login, type, phone, bank_account_number, cash, email, date_joined, is_staff, is_superuser, username, first_name, last_name, is_active
+  Filter: (authenticate_user.phone = 912)
+  Rows Removed by Filter: 1
+Planning Time: 0.110 ms
+Execution Time: 0.055 ms
+
+Seq Scan on public.authenticate_user  (cost=0.00..10.50 rows=1 width=1857) (actual time=0.005..0.006 rows=1 loops=1)
+  Output: id, password, last_login, type, phone, bank_account_number, cash, email, date_joined, is_staff, is_superuser, username, first_name, last_name, is_active
+  Filter: (authenticate_user.type = 5)
+  Rows Removed by Filter: 1
+Planning Time: 0.025 ms
+Execution Time: 0.014 ms
+
+Seq Scan on public.authenticate_user  (cost=0.00..10.40 rows=40 width=1857) (actual time=0.004..0.004 rows=2 loops=1)
+  Output: id, password, last_login, type, phone, bank_account_number, cash, email, date_joined, is_staff, is_superuser, username, first_name, last_name, is_active
+Planning Time: 0.018 ms
+Execution Time: 0.011 ms
+
+********************************************************************************************************************************************************************

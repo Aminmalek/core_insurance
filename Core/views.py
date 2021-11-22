@@ -103,3 +103,7 @@ class TestView(APIView):
         else:
             print(type_confirmation(user.type,("Company","Insured")))
             return Response({"bye"})
+        
+    """ data={k: v for k, v in dict(request.data).items() if v}
+       
+        d = ExitAndEnterTime.objects.filter(id=id).update(**data)"""
