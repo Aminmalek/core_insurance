@@ -2,7 +2,6 @@ from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 from authenticate.models import User
 from django.urls import reverse
-from insurance.models import Insurance
 from Core.models import Message
 
 
@@ -74,32 +73,4 @@ class CoreTests(APITestCase):
         response = self.client.put('/api/message/6', data)
         self.assertEqual(400, response.status_code)
 
-    def test_7_(self):
-
-        a = User.objects.filter(username="475274524752").explain(verbose=True, analyze=True)
-        d = User.objects.filter(phone="912").explain(verbose=True, analyze=True)
-
-        user = User.objects.create_user(id=5, username="4545452", password="654654", first_name="amin",
-                                        last_name="malek", phone=9421518515, type=5, bank_account_number=878454876546546574654)
-        User.objects.create_user(id=5, username="45445452", password="654654", first_name="amin",
-                                 last_name="malek", phone=94215184515, type=5, bank_account_number=878454876546546574654)
-        token = Token.objects.create(user=user)
-
-        token = Token.objects.get_or_create(user=user)
-
-        b = User.objects.filter(type=5).explain(verbose=True, analyze=True)
-                                                
-
-        c = User.objects.all().explain(verbose=True, analyze=True)
-                                      
-
-        f = open("user_queries_explain.txt", "w")
-
-        f.write(str(a)+"\n\n")
-        f.write(str(d)+"\n\n")
-        f.write(str(b)+"\n\n")
-        f.write(str(c)+"\n\n")
-        count = len(str(c))/2
-        f.write("*"*int(count))
-        
-        f.close()
+   
