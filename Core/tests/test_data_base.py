@@ -3,10 +3,11 @@ from rest_framework.authtoken.models import Token
 from authenticate.models import User
 from django.urls import reverse
 from insurance.models import Insurance, Coverage
+from insured.models import Insured
+from payment.models import InsuranceConnector
 import random
 import string
 import sys
-from time import sleep
 
 
 class CoreTests(APITestCase):
@@ -31,11 +32,11 @@ class CoreTests(APITestCase):
         for a in range(1, user_numbers):
 
             sys.stdout.write('\r')
-            # the exact output you're looking for:
+
             j = (a + 1) / user_numbers
             sys.stdout.write("[%-20s] %d%%" % ('='*int(20*j), 100*j))
             sys.stdout.flush()
-            #sleep(0.25)
+
             name = ''.join(random.choices(
                 string.ascii_uppercase + string.digits, k=20))
             password = "123456"
@@ -92,3 +93,22 @@ class CoreTests(APITestCase):
         count = len(str(inurance_by_id))/2
         f.write("*"*int(count))
         f.close()
+
+    def test_insured(self):
+        insureds = Insured.objects.all()
+        Insured.objects.filter(user=id)
+
+    def test_payment(self):
+        insurance_connector = InsuranceConnector.objects.all()
+        parent = Insured.objects.get(supported_insureds=user)
+        insurance_connector = InsuranceConnector.objects.filter(
+            user=parent.user)
+
+    def test_super_holder(self):
+        pass
+
+    def test_ticket(self):
+        pass
+
+    def test_claim(self):
+        pass
