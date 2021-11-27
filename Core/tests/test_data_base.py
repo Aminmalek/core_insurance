@@ -5,12 +5,14 @@ from django.urls import reverse
 from insurance.models import Insurance, Coverage
 from insured.models import Insured
 from payment.models import InsuranceConnector
+from super_holder.models import SuperHolder
+from ticket.models import Ticket
 import random
 import string
 import sys
 
 
-class CoreTests(APITestCase):
+class QueryTests(APITestCase):
 
     def setUp(self):
         self.username = "54872154"
@@ -25,7 +27,7 @@ class CoreTests(APITestCase):
 
     def api_authentication(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-
+    
     def test_user(self):
         user_numbers = 10000
 
@@ -97,18 +99,64 @@ class CoreTests(APITestCase):
     def test_insured(self):
         insureds = Insured.objects.all()
         Insured.objects.filter(user=id)
+    
+    # python3 manage.py test Core.tests.test_data_base.QueryTests.test_payment
+    # This is the way you can run a specific test that you need
 
     def test_payment(self):
-        insurance_connector = InsuranceConnector.objects.all()
-        parent = Insured.objects.get(supported_insureds=user)
-        insurance_connector = InsuranceConnector.objects.filter(
-            user=parent.user)
+        insurance = Insurance.objects.create(
+            name="bime1", description="this is an insurance!!!", price=120000)
+        user = User.objects.create_user(id=42, username="45445452", password="654654", first_name="amin",
+                                        last_name="malek", phone=94215184515, type=5, bank_account_number=878454876546546574654)
+        insurance_connector_counts = 50
+
+        for a in range(1, insurance_connector_counts):
+            sys.stdout.write('\r')
+            j = (a + 1) / insurance_connector_counts
+            sys.stdout.write("[%-20s] %d%%" % ('='*int(20*j), 100*j))
+            sys.stdout.flush()
+            InsuranceConnector.objects.create(user=user, insurance=insurance, payment_code=646874654, register_form={
+                                              "name": "amin", "age": 22, "college": "college"})
+
+        insurance_connector = InsuranceConnector.objects.all().explain(verbose=True,
+                                                                       analyze=True)
+        insurance_connector_all = InsuranceConnector.objects.filter(
+            user=user).explain(verbose=True, analyze=True)
+        f = open("insurance_connector_queries_explain.txt", "w")
+        f.write(str(insurance_connector)+"\n\n")
+        f.write(str(insurance_connector_all)+"\n\n")
+        f.close()
 
     def test_super_holder(self):
-        pass
+        superholders = SuperHolder.objects.all()
 
     def test_ticket(self):
-        pass
-
+        user_1 =user = User.objects.create_user(id=452, username="7527852", password="654654", first_name="amin",
+                                        last_name="malek", phone=827852752, type=5, bank_account_number=878454876546546574654)
+        user_2 = user = User.objects.create_user(id=442, username="7278575278527", password="654654", first_name="amin",
+                                        last_name="malek", phone=725757527852, type=5, bank_account_number=878454876546546574654)
+        user_3 = user = User.objects.create_user(id=4222, username="22752752752", password="654654", first_name="amin",
+                                        last_name="malek", phone=94215184515, type=5, bank_account_number=878454876546546574654)
+        user_4 = user = User.objects.create_user(id=4422, username="752752752", password="654654", first_name="amin",
+                                        last_name="malek", phone=752752752, type=5, bank_account_number=878454876546546574654)
+        user_5 = user = User.objects.create_user(id=424, username="752785278868", password="654654", first_name="amin",
+                                        last_name="malek", phone=7878378358736, type=5, bank_account_number=878454876546546574654)
+        ticket_counts = 10000
+        for a in range(1, ticket_counts):
+            sys.stdout.write('\r')
+            j = (a + 1) / ticket_counts
+            
+            sys.stdout.write("%-10s %d%%" % ('\U0001f600'*int(10*j), 100*j))
+            sys.stdout.flush()
+            user = random.choice([user_1,user_2,user_3,user_4,user_5])
+            Ticket.objects.create(
+                user=user, name="ticket_name", status='Opened', description="ikuhdfuhwoeufhwoeruifwouierfgwoueirfgow")
+      
+        ticket1 = Ticket.objects.filter(user= user_2).explain(verbose=True, analyze=True)
+        ticket2 = Ticket.objects.all().explain(verbose=True, analyze=True)
+        f = open("ticket_queries_explain.txt", "w")
+        f.write(str(ticket1)+"\n\n")
+        f.write(str(ticket2)+"\n\n")
+        f.close()
     def test_claim(self):
         pass

@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -43,6 +42,7 @@ EXTERNAL_APPS = [
     'rest_framework.authtoken',
     'rest_framework',
     'corsheaders',
+    
 ]
 LOCAL_APPS = [
     'authenticate',
@@ -95,7 +95,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'bime',
-        'USER': 'postgres',
+        'USER': 'amin',
         'PASSWORD': '123456',
         'HOST': '127.0.0.1',
         'PORT': '5432',
