@@ -25,7 +25,7 @@ class Ticket(models.Model):
     name = models.CharField(max_length=150)
     description = models.TextField(max_length=250, null=True,)
     status = models.CharField(
-        max_length=10, choices=TICKET_STATUS_CHOICES, null=True)
+        max_length=10, choices=TICKET_STATUS_CHOICES, default="Opened")
 
     def __str__(self):
         return self.name
@@ -46,7 +46,7 @@ class Claim(models.Model):
         InsuranceConnector, on_delete=models.DO_NOTHING)
     title = models.CharField(max_length=100)
     description = models.TextField(max_length=250, null=True,)
-    status = models.CharField(max_length=10, choices=CLAIM_STATUS_CHOICES)
+    status = models.CharField(max_length=10, choices=CLAIM_STATUS_CHOICES,default="Opened")
     response = models.TextField(max_length=250)
     claim_form = models.JSONField()
     is_archived = models.BooleanField(default=False)

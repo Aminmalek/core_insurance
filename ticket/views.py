@@ -116,12 +116,12 @@ class ClaimView(APIView):
             claim = Claim.objects.create(
                 user=user, insurance=insurance, status='Opened', claim_form=claims_form,
                 description=description, claimed_amount=claimed_amount, claim_date=claim_date)
-            for objects in coverage:
-                claim_form = self.claim_form_uuid_generator(
-                    objects["claim_form"])
-                cover = Coverage.objects.create(
-                    name=objects['name'], claim_form=claim_form, capacity=objects['capacity'])
-                claim.coverage.add(cover)
+            
+            claim_form = self.claim_form_uuid_generator(
+                coverage["claim_form"])
+            cover = Coverage.objects.create(
+                name=coverage['name'], claim_form=claim_form, capacity=coverage['capacity'])
+            claim.coverage.add(cover)
 
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
@@ -141,7 +141,7 @@ class ClaimView(APIView):
             vendor = data['vendor']
             specefic_name = data['specefic_name']
             coverage = data['coverage']
-            insurance = InsuranceConnector.objects.get(id=insurance)
+            
             claim = Claim.objects.get(id=id)
             if reviewer:
                 reviewer_user = User.objects.get(username=reviewer)
@@ -157,6 +157,7 @@ class ClaimView(APIView):
             if claim_status:
                 claim.status = claim_status
             if insurance:
+                insurance = InsuranceConnector.objects.get(id=insurance)
                 claim.insurance = insurance
             if franchise:
                 claim.franchise = franchise
