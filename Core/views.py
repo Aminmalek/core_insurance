@@ -1,17 +1,21 @@
+from os import error
 import uuid
 from django.http import HttpResponse
 from rest_framework import status
 from rest_framework import permissions
+from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from Health_Insurance.settings import BASE_DIR
+from rest_framework.decorators import action
 from authenticate.models import User
-from .decorators import type_check,type_confirmation
+from authenticate.serializers import UserSerializer
+from .decorators import type_check, type_confirmation
 from .models import Message
 from .serializers import MessageSerializer
-
+from rest_framework.exceptions import NotFound
 
 class FileView(APIView):
     parser_class = (FileUploadParser,)
@@ -41,10 +45,10 @@ class FileView(APIView):
         return response
 
 
-class MessageView(APIView):
+class MessageViewSet(viewsets.ViewSet):
 
-    @type_check (["Company","Vendor"])
-    def post(self, request):
+    @type_check(("Company", "Vendor", "CompanyAdmin"))
+    def create(self, request):
         user = request.user
         data = request.data
         if data:
@@ -57,53 +61,55 @@ class MessageView(APIView):
         else:
             return Response({"error": "please send your message first"}, status=status.HTTP_400_BAD_REQUEST)
 
-    @type_check (["Company","Vendor"])
-    def get(self, request):
+    @type_check(("Company", "Vendor", "CompanyAdmin"))
+    @action(['GET'], detail=False, url_path='sent-messages', url_name='sent-messages',)
+    def list_sent_messages(self, request):
         user = request.user
-        sender = request.query_params.get('sender', None)
-        if sender is not None:
-            message = Message.objects.filter(sender=sender)
-            serializer = MessageSerializer(message, many=True)
-            return Response({"message": serializer.data}, status=status.HTTP_202_ACCEPTED)
-        else:
-            message = Message.objects.filter(receiver=user.id)
-            serializer = MessageSerializer(message, many=True)
-            return Response(serializer.data)
+        message = Message.objects.filter(sender=user)
+        serializer = MessageSerializer(message, many=True)
+        return Response(serializer.data)
 
-    @type_check (["Company","Vendor"])
-    def put(self, request, id):
+    @type_check(("Company", "Vendor", "CompanyAdmin"))
+    @action(['GET'], detail=False, url_path='received-messages', url_name='received-messages',)
+    def list_received_messages(self, request):
+        user = request.user
+        message = Message.objects.filter(receiver=user.id)
+        serializer = MessageSerializer(message, many=True)
+        return Response(serializer.data)
+
+    @type_check(("Company", "Vendor", "CompanyAdmin"))
+    def update(self, request, pk):
         user = request.user
         data = request.data
         response = data['response']
-        message = Message.objects.get(id=id)
+        message = Message.objects.get(id=pk)
         if message.receiver == user:
             message.response = response
             message.save()
             return Response({"message": "message updated successfuly"})
         else:
-            return Response({"error": "you can only update your messages"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "you can only send response to your messages"}, status=status.HTTP_400_BAD_REQUEST)
 
-    @type_check (["Company","Vendor"])
-    def delete(self, request, id):
+    @type_check(("Company", "Vendor", "CompanyAdmin"))
+    @action(['GET'], detail=False, url_path='get-users', url_name='get-users',)
+    def get_users(self, request):
+        users = User.objects.filter(type__in=[1, 2, 6])
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+
+    @type_check(("Company", "Vendor", "CompanyAdmin"))
+    def delete(self, request, pk):
         user = request.user
-        message = Message.objects.get(id=id)
+        try:
+            message = Message.objects.get(id=pk)
+        except Message.DoesNotExist:
+            raise NotFound(detail="message doesn't exist", code=404)
         if message.sender == user:
             message.delete()
             return Response({"message": "message deleted successfuly"})
         else:
             return Response({"error": "you can only delete your messages"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-class TestView(APIView):
-   
-    def get(self, request):
-        user = request.user
-        if type_confirmation(user.type,("Vendor","Insured")):
-            return Response({"hello"})
-        else:
-            print(type_confirmation(user.type,("Company","Insured")))
-            return Response({"bye"})
-        
     """ data={k: v for k, v in dict(request.data).items() if v}
        
         d = ExitAndEnterTime.objects.filter(id=id).update(**data)"""
