@@ -95,12 +95,11 @@ class ClaimView(APIView):
             claim = Claim.objects.create(
                 user=user, title=title, insurance=insurance, status='Opened', claim_form=claims_form, description=description,
                 claimed_amount=claimed_amount, claim_date=claim_date)
-            for objects in coverage:
-                claim_form = self.claim_form_uuid_generator(
-                    objects["claim_form"])
-                cover = Coverage.objects.create(
-                    name=objects['name'], claim_form=claim_form, capacity=objects['capacity'])
-                claim.coverage.add(cover)
+            claim_form = self.claim_form_uuid_generator(
+                coverage["claim_form"])
+            cover = Coverage.objects.create(
+                name=coverage['name'], claim_form=claim_form, capacity=coverage['capacity'])
+            claim.coverage.add(cover)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
         elif type_confirmation(user.type, ("Company", "CompanyAdmin")):
@@ -116,7 +115,7 @@ class ClaimView(APIView):
             claim = Claim.objects.create(
                 user=user, insurance=insurance, status='Opened', claim_form=claims_form,
                 description=description, claimed_amount=claimed_amount, claim_date=claim_date)
-            
+
             claim_form = self.claim_form_uuid_generator(
                 coverage["claim_form"])
             cover = Coverage.objects.create(
@@ -141,7 +140,7 @@ class ClaimView(APIView):
             vendor = data['vendor']
             specefic_name = data['specefic_name']
             coverage = data['coverage']
-            
+
             claim = Claim.objects.get(id=id)
             if reviewer:
                 reviewer_user = User.objects.get(username=reviewer)
@@ -171,12 +170,11 @@ class ClaimView(APIView):
                 claim.specefic_name = specefic_name
             if coverage:
                 claim.coverage.clear()
-                for objects in coverage:
-                    claim_form = self.claim_form_uuid_generator(
-                        objects["claim_form"])
-                    cover = Coverage.objects.create(
-                        name=objects['name'], claim_form=claim_form, capacity=objects['capacity'])
-                    claim.coverage.add(cover)
+                claim_form = self.claim_form_uuid_generator(
+                coverage["claim_form"])
+                cover = Coverage.objects.create(
+                name=coverage['name'], claim_form=claim_form, capacity=coverage['capacity'])
+            claim.coverage.add(cover)
             claim.save()
             return Response({"message": "Claim updated successfuly"}, status=status.HTTP_200_OK)
 
@@ -203,13 +201,11 @@ class ClaimView(APIView):
                 if description:
                     claim.description = description
                 if coverage:
-                    claim.coverage.clear()
-                    for objects in coverage:
-                        claim_form = self.claim_form_uuid_generator(
-                            objects["claim_form"])
-                        cover = Coverage.objects.create(
-                            name=objects['name'], claim_form=claim_form, capacity=objects['capacity'])
-                        claim.coverage.add(cover)
+                    claim_form = self.claim_form_uuid_generator(
+                    coverage["claim_form"])
+                    cover = Coverage.objects.create(
+                    name=coverage['name'], claim_form=claim_form, capacity=coverage['capacity'])
+                    claim.coverage.add(cover)
                 if claimed_amount:
                     claim.claimed_amount = claimed_amount
                 if claim_date:
@@ -244,5 +240,5 @@ class DataVendorView(APIView):
             for row in data:
                 regx = re.search(str(searched_name), str(row))
                 if regx:
-                    user_needed_rows.append(row) 
+                    user_needed_rows.append(row)
         return Response(user_needed_rows)
