@@ -92,14 +92,11 @@ class ClaimView(APIView):
             claim_date = data['claim_date']
             coverage = data['coverage']
             insurance = InsuranceConnector.objects.get(id=insurance)
+            coverage = Coverage.objects.get(id=coverage)
             claim = Claim.objects.create(
                 user=user, title=title, insurance=insurance, status='Opened', claim_form=claims_form, description=description,
                 claimed_amount=claimed_amount, claim_date=claim_date)
-            claim_form = self.claim_form_uuid_generator(
-                coverage["claim_form"])
-            cover = Coverage.objects.create(
-                name=coverage['name'], claim_form=claim_form, capacity=coverage['capacity'])
-            claim.coverage.add(cover)
+            claim.coverage.add(coverage)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
         elif type_confirmation(user.type, ("Company", "CompanyAdmin")):
@@ -112,15 +109,11 @@ class ClaimView(APIView):
             claim_date = data['claim_date']
             user = User.objects.get(username=username)
             insurance = InsuranceConnector.objects.get(id=insurance)
+            coverage = Coverage.objects.get(id=coverage)
             claim = Claim.objects.create(
                 user=user, insurance=insurance, status='Opened', claim_form=claims_form,
                 description=description, claimed_amount=claimed_amount, claim_date=claim_date)
-
-            claim_form = self.claim_form_uuid_generator(
-                coverage["claim_form"])
-            cover = Coverage.objects.create(
-                name=coverage['name'], claim_form=claim_form, capacity=coverage['capacity'])
-            claim.coverage.add(cover)
+            claim.coverage.add(coverage)
 
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
@@ -170,11 +163,8 @@ class ClaimView(APIView):
                 claim.specefic_name = specefic_name
             if coverage:
                 claim.coverage.clear()
-                claim_form = self.claim_form_uuid_generator(
-                coverage["claim_form"])
-                cover = Coverage.objects.create(
-                name=coverage['name'], claim_form=claim_form, capacity=coverage['capacity'])
-            claim.coverage.add(cover)
+                coverage = Coverage.objects.get(id=coverage)
+                claim.coverage.add(coverage)
             claim.save()
             return Response({"message": "Claim updated successfuly"}, status=status.HTTP_200_OK)
 
@@ -201,11 +191,9 @@ class ClaimView(APIView):
                 if description:
                     claim.description = description
                 if coverage:
-                    claim_form = self.claim_form_uuid_generator(
-                    coverage["claim_form"])
-                    cover = Coverage.objects.create(
-                    name=coverage['name'], claim_form=claim_form, capacity=coverage['capacity'])
-                    claim.coverage.add(cover)
+                    claim.coverage.clear()
+                    coverage = Coverage.objects.get(id=coverage)
+                    claim.coverage.add(coverage)
                 if claimed_amount:
                     claim.claimed_amount = claimed_amount
                 if claim_date:

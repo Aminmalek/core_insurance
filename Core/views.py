@@ -110,6 +110,4 @@ class MessageViewSet(viewsets.ViewSet):
         else:
             return Response({"error": "you can only delete your messages"}, status=status.HTTP_400_BAD_REQUEST)
 
-    """ data={k: v for k, v in dict(request.data).items() if v}
-       
-        d = ExitAndEnterTime.objects.filter(id=id).update(**data)"""
+ 
