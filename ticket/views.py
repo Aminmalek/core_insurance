@@ -3,6 +3,7 @@ import json
 import uuid
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from authenticate.models import User
 from payment.models import InsuranceConnector
@@ -95,8 +96,8 @@ class ClaimView(APIView):
             coverage = Coverage.objects.get(id=coverage)
             claim = Claim.objects.create(
                 user=user, title=title, insurance=insurance, status='Opened', claim_form=claims_form, description=description,
-                claimed_amount=claimed_amount, claim_date=claim_date)
-            claim.coverage.add(coverage)
+                claimed_amount=claimed_amount, claim_date=claim_date,coverage=coverage)
+            insurance.claim.add(claim)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
         elif type_confirmation(user.type, ("Company", "CompanyAdmin")):
@@ -112,9 +113,8 @@ class ClaimView(APIView):
             coverage = Coverage.objects.get(id=coverage)
             claim = Claim.objects.create(
                 user=user, insurance=insurance, status='Opened', claim_form=claims_form,
-                description=description, claimed_amount=claimed_amount, claim_date=claim_date)
-            claim.coverage.add(coverage)
-
+                description=description, claimed_amount=claimed_amount, claim_date=claim_date,coverage=coverage)
+            insurance.claim.add(claim)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
     @type_check(["Company", "Holder", "Insured", "SuperHolder", 'CompanyAdmin'])
@@ -162,9 +162,9 @@ class ClaimView(APIView):
             if specefic_name:
                 claim.specefic_name = specefic_name
             if coverage:
-                claim.coverage.clear()
+                
                 coverage = Coverage.objects.get(id=coverage)
-                claim.coverage.add(coverage)
+                claim.coverage = coverage
             claim.save()
             return Response({"message": "Claim updated successfuly"}, status=status.HTTP_200_OK)
 
@@ -191,9 +191,9 @@ class ClaimView(APIView):
                 if description:
                     claim.description = description
                 if coverage:
-                    claim.coverage.clear()
+                    
                     coverage = Coverage.objects.get(id=coverage)
-                    claim.coverage.add(coverage)
+                    claim.coverage = coverage
                 if claimed_amount:
                     claim.claimed_amount = claimed_amount
                 if claim_date:
@@ -230,3 +230,11 @@ class DataVendorView(APIView):
                 if regx:
                     user_needed_rows.append(row)
         return Response(user_needed_rows)
+
+
+class InsuranceConnectoreClaimView(APIView):
+    def get(self,request,id):
+        insurance = InsuranceConnector.objects.get(id=id)
+        claim = insurance.claim.all()
+        Serializer = ClaimSerializer(claim,many=True)
+        return Response(Serializer.data)

@@ -3,6 +3,7 @@ from authenticate.models import User
 from insurance.models import Insurance
 
 
+
 class InsuranceConnector(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     insurance = models.ForeignKey(
@@ -11,6 +12,6 @@ class InsuranceConnector(models.Model):
     is_paid = models.BooleanField(default=False)
     payment_code = models.IntegerField(null=True, blank=True)
     register_form = models.JSONField(null=True)
-
+    claim = models.ManyToManyField('ticket.Claim',blank=True,related_name="users_Claim")
     def __str__(self):
         return self.insurance.name

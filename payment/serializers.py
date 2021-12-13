@@ -10,3 +10,4 @@ class InsuranceConnectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = InsuranceConnector
         fields = ('id', 'user','insurance', 'is_accepted_by_company', 'is_paid', 'payment_code','register_form')
+

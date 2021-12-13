@@ -43,7 +43,7 @@ class Claim(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.PROTECT, null=True, blank=True)
     insurance = models.ForeignKey(
-        InsuranceConnector, on_delete=models.DO_NOTHING)
+        InsuranceConnector, on_delete=models.DO_NOTHING,related_name='claims_insurance')
     title = models.CharField(max_length=100)
     description = models.TextField(max_length=250, null=True,)
     status = models.CharField(max_length=10, choices=CLAIM_STATUS_CHOICES,default="Opened")
@@ -61,8 +61,8 @@ class Claim(models.Model):
     claimed_amount = models.IntegerField(null=True)
     claim_date = models.DateTimeField(null=True)
     specefic_name = models.CharField(max_length=50)
-    coverage = models.ManyToManyField(
-        Coverage, blank=True, related_name="claim_coverage")
+    coverage = models.ForeignKey(
+        Coverage, blank=True, related_name="claim_coverage", on_delete=models.CASCADE)
     reviewer_timeline = models.ManyToManyField(
         ReviewerTimeline, blank=True, related_name="claim_reviewer_time_line_claim")
 
