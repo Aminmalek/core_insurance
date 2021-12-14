@@ -85,8 +85,8 @@ class ClaimView(APIView):
         data = request.data
         user = request.user
         if type_confirmation(user.type, ("Holder", "SuperHolder", "Insured")):
-            
-            insurance = data['insurance_id']
+
+            insurance = data['insurance']
             title = data['title']
             description = data['description']
             coverage = data['coverage']
@@ -97,7 +97,7 @@ class ClaimView(APIView):
             coverage = Coverage.objects.get(id=coverage)
             claim = Claim.objects.create(
                 user=user, title=title, insurance=insurance, status='Opened', claim_form=claims_form, description=description,
-                claimed_amount=claimed_amount, claim_date=claim_date,coverage=coverage)
+                claimed_amount=claimed_amount, claim_date=claim_date, coverage=coverage)
             insurance.claim.add(claim)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
@@ -114,7 +114,7 @@ class ClaimView(APIView):
             coverage = Coverage.objects.get(id=coverage)
             claim = Claim.objects.create(
                 user=user, insurance=insurance, status='Opened', claim_form=claims_form,
-                description=description, claimed_amount=claimed_amount, claim_date=claim_date,coverage=coverage)
+                description=description, claimed_amount=claimed_amount, claim_date=claim_date, coverage=coverage)
             insurance.claim.add(claim)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
@@ -123,81 +123,56 @@ class ClaimView(APIView):
         data = request.data
         user = request.user
         if type_confirmation(user.type, ("Company", "CompanyAdmin")):
-            response = data['response']
-            claim_status = data['status']
-            reviewer = data['reviewer']
-            insurance = data['insurance']
-            franchise = data['franchise']
-            tariff = data['tariff']
-            payable_amount = data['payable_amount']
-            deductions = data['deductions']
-            vendor = data['vendor']
-            specefic_name = data['specefic_name']
-            coverage = data['coverage']
+
             claim = Claim.objects.get(id=id)
-            if reviewer:
-                reviewer_user = User.objects.get(username=reviewer)
+            data_put = {k: v for k, v in dict(request.data).items() if v}
+
+            if data_put['user']:
+                user = User.objects.get(username=data_put['user'])
+                data_put['user'] = user
+
+            if data_put['reviewer']:
+                reviewer_user = User.objects.get(username=data_put['reviewer'])
                 timeline = ReviewerTimeline.objects.create(
                     changed_by=user, reviewer=reviewer_user)
-                claim.reviewer = reviewer_user
+                data_put['reviewer'] = reviewer_user
                 claim.reviewer_timeline.add(timeline)
-            if vendor:
-                vendor = User.objects.get(username=vendor)
-                claim.vendor = vendor
-            if response:
-                claim.response = response
-            if claim_status:
-                claim.status = claim_status
-            if insurance:
-                insurance = InsuranceConnector.objects.get(id=insurance)
-                claim.insurance = insurance
-            if franchise:
-                claim.franchise = franchise
-            if tariff is not None:
-                claim.tariff = tariff
-            if payable_amount:
-                claim.payable_amount = payable_amount
-            if deductions is not None:
-                claim.deductions = deductions
-            if specefic_name:
-                claim.specefic_name = specefic_name
-            if coverage:
-                coverage = Coverage.objects.get(id=coverage)
-                claim.coverage = coverage
-            claim.save()
+
+            if data_put['coverage']:
+                coverage = Coverage.objects.get(id=data_put['coverage'])
+                data_put['coverage'] = coverage
+
+            if data_put['vendor']:
+                vendor = User.objects.get(username=data_put['vendor'])
+                data_put['vendor'] = vendor
+
+            if data_put['insurance']:
+                insurance = InsuranceConnector.objects.get(
+                    id=data_put['insurance'])
+                data_put['insurance'] = insurance
+
+            Claim.objects.filter(id=id).update(**data_put)
             return Response({"message": "Claim updated successfuly"}, status=status.HTTP_200_OK)
 
         if type_confirmation(user.type, ("Holder", "SuperHolder", "Insured")):
             claim = Claim.objects.get(id=id)
+            
             if user != claim.user:
                 return Response({"error": "user only can update his claims"}, status=status.HTTP_403_FORBIDDEN)
 
             if claim.status == 'Opened':
-                title = data['title']
-                claims_form = data['claim_form']
-                insurance_id = data['insurance']
-                description = data['description']
-                coverage = data['coverage']
-                claimed_amount = data['claimed_amount']
-                claim_date = data['claim_date']
-                if title:
-                    claim.title = title
-                if insurance_id:
-                    insurance = InsuranceConnector.objects.get(id=insurance_id)
-                    claim.insurance = insurance
-                if claims_form:
-                    claim.claim_form = claims_form
-                if description:
-                    claim.description = description
-                if coverage:
-                    
-                    coverage = Coverage.objects.get(id=coverage)
-                    claim.coverage = coverage
-                if claimed_amount:
-                    claim.claimed_amount = claimed_amount
-                if claim_date:
-                    claim.claim_date = claim_date
-                claim.save()
+
+                data_put = {k: v for k, v in dict(request.data).items() if v}
+                if data_put['coverage']:
+                    coverage = Coverage.objects.get(id=data_put['coverage'])
+                    data_put['coverage'] = coverage
+
+                if data_put['insurance']:
+                    insurance = InsuranceConnector.objects.get(
+                        id=data_put['insurance'])
+                    data_put['insurance'] = insurance
+
+                Claim.objects.filter(id=id).update(**data_put)
                 return Response({"message": "Claim updated successfuly"}, status=status.HTTP_200_OK)
             else:
                 return Response({"message": "user can't update your claim without company request"}, status=status.HTTP_403_FORBIDDEN)
@@ -232,8 +207,8 @@ class DataVendorView(APIView):
 
 
 class InsuranceConnectoreClaimView(APIView):
-    def get(self,request,id):
+    def get(self, request, id):
         insurance = InsuranceConnector.objects.get(id=id)
         claim = insurance.claim.all()
-        Serializer = ClaimSerializer(claim,many=True)
+        Serializer = ClaimSerializer(claim, many=True)
         return Response(Serializer.data)
