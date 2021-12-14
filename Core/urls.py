@@ -8,8 +8,6 @@ router.register('message', MessageViewSet, basename='message')
 
 urlpatterns = [
     path('media', FileView.as_view(), name="media"),
-    #path('message', MessageView.as_view(), name="message"),
-    #path('message/<int:id>', MessageView.as_view(), name="message"),
     path('', include(router.urls)),
    
 ]

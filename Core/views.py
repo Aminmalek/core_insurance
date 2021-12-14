@@ -17,6 +17,7 @@ from .models import Message
 from .serializers import MessageSerializer
 from rest_framework.exceptions import NotFound
 
+
 class FileView(APIView):
     parser_class = (FileUploadParser,)
     permission_classes = (permissions.AllowAny,)

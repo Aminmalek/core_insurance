@@ -53,9 +53,9 @@ class Claim(models.Model):
     reviewer = models.ForeignKey(
         User, on_delete=models.PROTECT, null=True, blank=True, related_name="claim_reviewer")
     franchise = models.IntegerField(null=True)
-    tarrif = models.IntegerField(null=True)
+    tariff = models.IntegerField(null=True)
     payable_amount = models.IntegerField(null=True)
-    deducations = models.IntegerField(null=True)
+    deductions = models.IntegerField(null=True)
     vendor = models.ForeignKey(
         User, on_delete=models.PROTECT, null=True, blank=True, related_name="vendor")
     claimed_amount = models.IntegerField(null=True)

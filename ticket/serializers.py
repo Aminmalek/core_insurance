@@ -13,6 +13,8 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 class ReviewerTimelineSerializer(serializers.ModelSerializer):
+    changed_by = UserMinifiedSerializer()
+    reviewer = UserMinifiedSerializer()
     class Meta:
         model = ReviewerTimeline
         fields = ['date', 'changed_by', 'reviewer']

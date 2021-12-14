@@ -17,7 +17,7 @@ from insurance.models import Coverage
 
 class TicketView(APIView):
 
-    @type_check(["Company", "Holder", "SuperHolder", "Vendor", "Insured", ])
+    @type_check(("Company", "Holder", "SuperHolder", "Vendor", "Insured", ))
     def get(self, request):
         user = request.user
         if type_confirmation(user.type, ("Holder", "SuperHolder", "Insured", "Vendor")):
@@ -27,7 +27,7 @@ class TicketView(APIView):
         serializer = TicketSerializer(tickets, many=True)
         return Response(serializer.data)
 
-    @type_check(["Company", "Holder", "SuperHolder", "Insured", "Vendor"])
+    @type_check(("Company", "Holder", "SuperHolder", "Insured", "Vendor"))
     def post(self, request):
         data = request.data
         user = request.user
@@ -37,7 +37,7 @@ class TicketView(APIView):
             user=user, name=ticket_name, status='Opened', description=description)
         return Response({"message": "Ticket created successfuly"}, status=status.HTTP_200_OK)
 
-    @type_check(["Company"])
+    @type_check(("Company",))
     def put(self, request, id):
         data = request.data
         ticket = Ticket.objects.get(id=id)
@@ -80,18 +80,19 @@ class ClaimView(APIView):
                 serializer = ClaimSerializer(claims, many=True)
         return Response(serializer.data)
 
-    @type_check(["Holder", "Insured", "Company", "SuperHolder", "CompanyAdmin"])
+    @type_check(("Holder", "Insured", "Company", "SuperHolder", "CompanyAdmin"))
     def post(self, request):
         data = request.data
         user = request.user
         if type_confirmation(user.type, ("Holder", "SuperHolder", "Insured")):
-            title = data['title']
+            
             insurance = data['insurance_id']
-            claims_form = data['claim_form']
+            title = data['title']
             description = data['description']
+            coverage = data['coverage']
+            claims_form = data['claim_form']
             claimed_amount = data['claimed_amount']
             claim_date = data['claim_date']
-            coverage = data['coverage']
             insurance = InsuranceConnector.objects.get(id=insurance)
             coverage = Coverage.objects.get(id=coverage)
             claim = Claim.objects.create(
@@ -117,7 +118,7 @@ class ClaimView(APIView):
             insurance.claim.add(claim)
             return Response({"message": "Claim created successfuly"}, status=status.HTTP_200_OK)
 
-    @type_check(["Company", "Holder", "Insured", "SuperHolder", 'CompanyAdmin'])
+    @type_check(("Company", "Holder", "Insured", "SuperHolder", 'CompanyAdmin'))
     def put(self, request, id):
         data = request.data
         user = request.user
@@ -133,7 +134,6 @@ class ClaimView(APIView):
             vendor = data['vendor']
             specefic_name = data['specefic_name']
             coverage = data['coverage']
-
             claim = Claim.objects.get(id=id)
             if reviewer:
                 reviewer_user = User.objects.get(username=reviewer)
@@ -153,16 +153,15 @@ class ClaimView(APIView):
                 claim.insurance = insurance
             if franchise:
                 claim.franchise = franchise
-            if tariff:
+            if tariff is not None:
                 claim.tariff = tariff
             if payable_amount:
                 claim.payable_amount = payable_amount
-            if deductions:
+            if deductions is not None:
                 claim.deductions = deductions
             if specefic_name:
                 claim.specefic_name = specefic_name
             if coverage:
-                
                 coverage = Coverage.objects.get(id=coverage)
                 claim.coverage = coverage
             claim.save()
@@ -203,7 +202,7 @@ class ClaimView(APIView):
             else:
                 return Response({"message": "user can't update your claim without company request"}, status=status.HTTP_403_FORBIDDEN)
 
-    @type_check(["Holder", "Insured", "SuperHolder"])
+    @type_check(("Holder", "Insured", "SuperHolder"))
     def delete(self, request, id):
         user = request.user
         claim = Claim.objects.get(id=id)
@@ -219,7 +218,7 @@ class DataVendorView(APIView):
     """
         For search in a medical json file
     """
-    @type_check(["Vendor", "Company"])
+    @type_check(("Vendor", "Company"))
     def get(self, request):
         searched_name = request.query_params.get('name', None)
         with open(BASE_DIR / 'data' / 'data.json', encoding='utf-8-sig') as file:
