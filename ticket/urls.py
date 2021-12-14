@@ -8,5 +8,5 @@ urlpatterns = [
     path('claim/<int:id>', ClaimView.as_view(), name="claim"),
     
     path('claim/name', DataVendorView.as_view(), name="data"),
-    path('insurance-connector/claim/<int:id>', InsuranceConnectoreClaimView.as_view(), name="claim"),
+    path('insurance_connector/claim/<int:id>', InsuranceConnectoreClaimView.as_view(), name="claim"),
 ]
