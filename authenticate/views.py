@@ -1,36 +1,30 @@
 from django.contrib import auth
 from rest_framework import permissions, status
+from rest_framework import response
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
-from .serializers import UserSerializer
+from authenticate import serializers as auth_serializers
 from .models import User
 from Core.decorators import *
+from rest_framework import exceptions
 
 
 class SignupView(APIView):
     """
         This API receives signup data, creates the user and logs in with the created user
     """
-
+    serializer_class = auth_serializers.SignupSerializer
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-        data = request.data
-        username = data['username']
-        password = data['password']
-        first_name = data['first_name']
-        last_name = data['last_name']
-        phone = data['phone']
-        bank_account_number = data['bank_account_number']
-        if User.objects.filter(username=username).exists() or User.objects.filter(phone=phone).exists():
-            return Response({'error': 'Username or Phone number already exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
-        else:
-            user = User.objects.create_user(username=username, password=password, first_name=first_name,
-                                            last_name=last_name, phone=phone, type=5, bank_account_number=bank_account_number)
-            token = Token.objects.create(user=user)
-            return Response({'token': token.key}, status=status.HTTP_201_CREATED)
-
+        serialized_data = self.serializer_class(data=request.data)
+        try:
+            if serialized_data.is_valid(raise_exception=True):
+                serialized_data.save()   
+        except:
+            return  Response({"message":"error while signup"},status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message":"user signed up successfully"})
 
 class LoginView(APIView):
     """
@@ -63,7 +57,7 @@ class LogoutView(APIView):
             return Response({'message': 'logged out'})
         except:
             content = {'error': 'something went wrong while logging out'}
-            return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(content, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
 class GetUserView(APIView):

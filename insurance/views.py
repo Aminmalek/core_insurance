@@ -11,7 +11,6 @@ class InsuranceView(APIView):
     """
         This api is used to handle full crud operations on insurance
     """
-
     def uuid_generator(self, object):
 
         for item in object:
@@ -21,6 +20,7 @@ class InsuranceView(APIView):
 
     @type_check(("Company", "Holder", "Insured", "SuperHolder", 'CompanyAdmin'))
     def get(self, request, id=None):
+        user = request.user
         if id:
             insurance = Insurance.objects.get(id=id)
             serializer = InsuranceSerializer(insurance)
