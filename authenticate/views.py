@@ -21,30 +21,28 @@ class SignupView(APIView):
         serialized_data = self.serializer_class(data=request.data)
         try:
             if serialized_data.is_valid(raise_exception=True):
-                serialized_data.save()   
+                serialized_data.save()
         except:
-            return  Response({"message":"error while signup"},status=status.HTTP_400_BAD_REQUEST)
-        return Response({"message":"user signed up successfully"})
+            return Response({"message": "error while signup"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "user signed up successfully"})
+
 
 class LoginView(APIView):
-    """
-       View for login user and get generate user
-    """
 
+    serializer_class = auth_serializers.LoginSerializer
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-        data = request.data
-        username = data['username']
-        password = data['password']
-        user = auth.authenticate(username=username, password=password)
-        if user:
-            token, created = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key})
-        else:
-            content = {'error': 'Username or Password is not true'}
-            return Response(content, status=status.HTTP_401_UNAUTHORIZED)
-
+        serialized_data = self.serializer_class(data=request.data)
+        if serialized_data.is_valid(raise_exception=True):
+            user = auth.authenticate(
+                username=request.data.get('username'), password=request.data.get('password'))
+            if user:
+                token, created = Token.objects.get_or_create(user=user)
+                return Response({'token': token.key})
+            else:
+                return Response({'error': 'username or password is not true'}, status=status.HTTP_401_UNAUTHORIZED)
+        
 
 class LogoutView(APIView):
     """
@@ -56,8 +54,7 @@ class LogoutView(APIView):
             request.user.auth_token.delete()
             return Response({'message': 'logged out'})
         except:
-            content = {'error': 'something went wrong while logging out'}
-            return Response(content, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+            return Response({'error': 'something went wrong while logging out'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
 class GetUserView(APIView):

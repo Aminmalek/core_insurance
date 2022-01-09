@@ -36,7 +36,11 @@ class SignupSerializer(serializers.Serializer):
         user.save()
         return user
         
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=15)
+    password = serializers.CharField(max_length=30)
 
+    
 class PermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Permission
