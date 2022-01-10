@@ -29,13 +29,19 @@ class SignupSerializer(serializers.Serializer):
             raise exceptions.ValidationError(
                 detail=('Password must contain at least one letter .'))
         return password
+
     def create(self, validated_data):
         password = validated_data['password']
         user = User.objects.create(**validated_data)
         user.set_password(password)
         user.save()
         return user
-        
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=15)
+    password = serializers.CharField(max_length=30)
+
 
 class PermissionSerializer(serializers.ModelSerializer):
     class Meta:

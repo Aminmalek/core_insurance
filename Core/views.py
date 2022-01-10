@@ -1,4 +1,3 @@
-from os import error
 import uuid
 from django.http import HttpResponse
 from rest_framework import status
@@ -12,7 +11,7 @@ from Health_Insurance.settings import BASE_DIR
 from rest_framework.decorators import action
 from authenticate.models import User
 from authenticate.serializers import UserSerializer
-from .decorators import type_check, type_confirmation
+from .decorators import type_check
 from .models import Message
 from .serializers import MessageSerializer
 from rest_framework.exceptions import NotFound
