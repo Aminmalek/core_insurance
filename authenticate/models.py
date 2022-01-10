@@ -20,28 +20,15 @@ class User(AbstractBaseUser):
     cash = models.IntegerField(default=0)
     email = models.EmailField(('email address'), blank=True)
     date_joined = models.DateTimeField(('date joined'), default=timezone.now)
-    is_staff = models.BooleanField(
-        ('staff status'),
-        default=False,
-    )
-    is_superuser = models.BooleanField(
-        ('superuser status'),
-        default=False,
-    )
-    username = models.CharField(
-        ('username'),
-        max_length=150,
-        unique=True,
-        error_messages={
-            'unique': ("A user with that username already exists."),
-        },
-    )
+    is_staff = models.BooleanField(('staff status'),  default=False,)
+    is_superuser = models.BooleanField(('superuser status'), default=False,)
+    username = models.CharField(('username'), max_length=10, unique=True, error_messages={
+                                'unique': ("A user with that username already exists."), },)
     first_name = models.CharField(('first name'), max_length=150, blank=True)
     last_name = models.CharField(('last name'), max_length=150, blank=True)
-    is_active = models.BooleanField(
-        ('active'),
-        default=True,)
+    is_active = models.BooleanField(('active'), default=True,)
     objects = UserManager()
+
     def has_perm(self, perm, obj=None):
         return self.is_superuser
 
